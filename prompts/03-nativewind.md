@@ -4,7 +4,7 @@ Status: done
 
 ## Goal
 
-The app styles with `className` through NativeWind v5, matching `AGENTS.md`. A fresh checkout can run `npx expo start`, import `src/global.css` once, and render a styled screen on native and web. This is the groundwork the design system (02) builds its tokens on.
+The app styles with `className` through NativeWind v5, matching `AGENTS.md`. A fresh checkout can run `npx expo start`, import `src/global.css` once, and render a styled screen on native and web. This is the groundwork the design system (04) builds its tokens on.
 
 ## Decisions
 
@@ -13,16 +13,16 @@ The app styles with `className` through NativeWind v5, matching `AGENTS.md`. A f
 - **CSS lives at `src/global.css`** (not the guide's root `./global.css`), because `AGENTS.md` and the design-system section point there and it keeps app files under `src/`. Imported once in `src/app/_layout.tsx`.
 - **`postcss.config.mjs`**, not `.cjs`: Expo 58 discovers `.js`/`.mjs` only. (Same constraint the guide states for Expo 57.)
 - **No `babel.config.js`.** The v5 Metro integration applies the className import rewrite; the v4 Babel preset and `jsxImportSource` are gone. `AGENTS.md` states this.
-- **`userInterfaceStyle` stays `"automatic"`** as the guide requires for `dark:`. Switching to light-only is the design-system task (02).
+- **`userInterfaceStyle` stays `"automatic"`** as the guide requires for `dark:`. The design-system task (04) supplies the dark values.
 - **Committed `nativewind-env.d.ts`** with the `react-native-css/types` reference, so `npx tsc --noEmit` works without first booting the dev server (the generator would otherwise create it).
-- **Defaults picked without asking:** no `@source` directives until a class actually lives outside `src/`; no `prettier-plugin-tailwindcss` (no Prettier config in the repo); no design tokens or fonts (that is 02); `withNativewind` takes no options (defaults `globalClassNamePolyfill: true`, `typescriptEnvPath: "nativewind-env.d.ts"`).
+- **Defaults picked without asking:** no `@source` directives until a class actually lives outside `src/`; no `prettier-plugin-tailwindcss` (no Prettier config in the repo); no design tokens or fonts (that is 04); `withNativewind` takes no options (defaults `globalClassNamePolyfill: true`, `typescriptEnvPath: "nativewind-env.d.ts"`).
 - **Verification is Windows-only.** There is no iOS simulator here, so the checks are the Tailwind CLI, `expo export` for native + web, type check, lint and doctor. The simulator comparison stays with the user.
 
 ## Out of scope
 
-- Design tokens, `@theme` values, the font ramp, radius/shadow scale, motion values (02-system-design).
+- Design tokens, `@theme` values, the font ramp, radius/shadow scale, motion values (04-design-system).
 - `Stack.Protected` route guards, Clerk, tabs, any screen beyond the smoke test.
-- Dark mode values. `dark:` variants compile, but nothing uses them yet.
+- Dark mode values. `dark:` variants compile, but nothing used them when this plan was written; 04 later supplied dark values as `prefers-color-scheme` overrides of the same tokens.
 - Migrating anything from v4 — nothing was ever installed.
 
 ## Steps

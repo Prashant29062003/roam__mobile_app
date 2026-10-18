@@ -3,3 +3,135 @@
 @import "tailwindcss/utilities.css";
 
 @import "nativewind/theme";
+
+/*
+ * Roam design tokens.
+ *
+ * The palette lives here as CSS variables rather than a TS theme file, because
+ * this app styles through NativeWind. Every screen reaches these values as a
+ * utility class (`bg-surface`, `p-md`, `rounded-card`, `text-heading`) so no
+ * screen ever hardcodes a hex value, size, or spacing step.
+ *
+ * Source of truth: assets/images/prompt-imgs/prompt-imgs/design.png
+ *
+ * The `@theme` block only *maps* `--color-*` onto the switchable `--roam-*`
+ * values declared in `:root` below. Light and dark are therefore a single
+ * token set that flips with the system appearance, rather than a `dark:`
+ * twin that every call site has to remember.
+ */
+@theme {
+  /* Brand ---------------------------------------------------------------- */
+  --color-primary: var(--roam-primary);
+  --color-star: var(--roam-primary);
+  --color-lavender: var(--roam-lavender);
+
+  /* Text/icon colors that sit on a brand fill. `--color-on-primary` is fixed
+   * across both schemes: the yellow fill is light enough in dark mode that its
+   * label stays dark, which is what keeps the primary button legible either
+   * way. `--color-on-lavender` does flip, because lavender lightens in dark. */
+  --color-on-primary: var(--roam-on-primary);
+  --color-on-lavender: var(--roam-on-lavender);
+
+  /* Surfaces and text --------------------------------------------------- */
+  --color-background: var(--roam-background);
+  --color-surface: var(--roam-surface);
+  --color-foreground: var(--roam-foreground);
+  --color-muted: var(--roam-muted);
+  --color-border: var(--roam-border);
+
+  /* Tints, status, and glass --------------------------------------------- */
+  --color-lavender-tint: var(--roam-lavender-tint);
+  --color-glass: var(--roam-glass);
+  --color-success: var(--roam-success);
+  --color-success-tint: var(--roam-success-tint);
+  --color-error: var(--roam-error);
+  --color-error-tint: var(--roam-error-tint);
+  --color-star-tint: var(--roam-star-tint);
+  --color-info-tint: var(--roam-info-tint);
+
+  /* Spacing (4pt grid) --------------------------------------------------- */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+
+  /* Radius --------------------------------------------------------------- */
+  --radius-control: 12px;
+  --radius-card: 16px;
+  --radius-full: 9999px;
+
+  /* Typography ----------------------------------------------------------- *
+   * The design specifies Geometric Sans. No font files are bundled yet, so
+   * these steps resolve to the platform sans that `nativewind/theme` already
+   * sets (`--font-sans`). Adding Geometric Sans later means loading it with
+   * `expo-font` and setting `fontFamily` here; the ramp itself does not move.
+   */
+  --text-display: 56px;
+  --text-display--line-height: 1;
+  --text-heading: 28px;
+  --text-heading--line-height: 1.2;
+  --text-title: 22px;
+  --text-title--line-height: 1.2;
+  --text-body: 16px;
+  --text-body--line-height: 1.5;
+  --text-caption: 14px;
+  --text-caption--line-height: 1.5;
+  --text-button: 17px;
+  --text-button--line-height: 1.2;
+
+  /* Input text. Deliberately has no `--text-field--line-height` companion:
+   * a line-height on a single-line TextInput makes iOS wrap the line and
+   * clips the field, so this step carries a size and nothing else. */
+  --text-field: 16px;
+
+  /* Motion --------------------------------------------------------------- */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+}
+
+:root {
+  --roam-primary: #ffc629;
+  --roam-lavender: #c984f4;
+  --roam-on-primary: #0b0b1a;
+  --roam-on-lavender: #ffffff;
+
+  --roam-background: #f4f5f7;
+  --roam-surface: #ffffff;
+  --roam-foreground: #0b0b1a;
+  --roam-muted: #6b7280;
+  --roam-border: #e5e7eb;
+
+  --roam-lavender-tint: #f4e8fd;
+  --roam-glass: rgba(255, 255, 255, 0.7);
+  --roam-success: #0e7a54;
+  --roam-success-tint: #e3f5ec;
+  --roam-error: #d92d20;
+  --roam-error-tint: #fdeceb;
+  --roam-star-tint: #fdf1d6;
+  --roam-info-tint: #e6eefb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --roam-primary: #ffc629;
+    --roam-lavender: #d8a6f8;
+    --roam-on-primary: #0b0b1a;
+    --roam-on-lavender: #0b0b1a;
+
+    --roam-background: #0b0b1a;
+    --roam-surface: #17172a;
+    --roam-foreground: #f5f5f7;
+    --roam-muted: #9ca3af;
+    --roam-border: #2a2a3f;
+
+    --roam-lavender-tint: #2a1f3d;
+    --roam-glass: rgba(23, 23, 42, 0.7);
+    --roam-success: #3ddc9a;
+    --roam-success-tint: #12312a;
+    --roam-error: #ff7a70;
+    --roam-error-tint: #3a1c1c;
+    --roam-star-tint: #3a2f14;
+    --roam-info-tint: #1a2438;
+  }
+}
