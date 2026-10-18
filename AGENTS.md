@@ -86,6 +86,7 @@ Designs are attached in the chat. Screens must match them exactly: layout, spaci
 - Third-party views (`GlassView`, `expo-image`, `react-native-svg`) need `styled(X, { className: "style" })` before `className` works. `styled` over `GlassViewProps` explodes TypeScript's union representation, so it is cast to `ComponentType<ViewProps>` in and back to the real props out — see `tab-bar.tsx`.
 - Icons are decorative by default and hidden from assistive tech; the enclosing control carries the label.
 - These 14 primitives were built ahead of their first screen, because the design sheet is the second user of each. The two-screens rule applies to everything added after them; do not read it as "these were exempt because they are primitives".
+- The reference page is `/design-system` (`src/app/design-system.tsx`, scaffolding in `src/components/design-system/`, which stays out of `ui/` because nothing else uses it). Its System/Light/Dark switch calls `colorScheme` from `react-native-css` and resets to the device value on unmount, so reviewing dark mode never leaks into the rest of the app. That switch exercises the real `@media (prefers-color-scheme)` overrides, not a mock.
 
 ## Reporting
 

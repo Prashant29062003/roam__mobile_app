@@ -1,4 +1,5 @@
 export {
+  darkColors,
   lightColors,
   useThemeColors,
   type ColorToken,

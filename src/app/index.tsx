@@ -15,6 +15,9 @@ import {
 } from "@/components/ui";
 import { shadows } from "@/theme";
 
+import { router } from "expo-router";
+
+
 /**
  * Design-system smoke test. Every screen replaces this; it stays until there
  * is a real screen to look at, and it is the fastest way to see a token or a
@@ -36,6 +39,14 @@ export default function Index() {
           Find unforgettable stays for every kind of trip.
         </ThemedText>
       </View>
+
+
+      <Button
+        title="View Design System"
+        variant="secondary"
+        onPress={() => router.push("/design-system")}
+      />
+
 
       <View className="gap-sm">
         <ThemedText variant="heading">Find your next stay</ThemedText>
@@ -81,8 +92,8 @@ export default function Index() {
       </View>
 
       <Card variant="tinted" className="p-md">
-        <ProfileRow label="Ask about policies" icon="sparkle" onPress={() => {}} />
-        <ProfileRow label="Payment methods" icon="calendar" onPress={() => {}} />
+        <ProfileRow label="Ask about policies" icon="sparkle" onPress={() => { }} />
+        <ProfileRow label="Payment methods" icon="calendar" onPress={() => { }} />
       </Card>
 
       <SegmentedControl

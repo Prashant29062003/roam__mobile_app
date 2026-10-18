@@ -37,8 +37,16 @@ export interface ThemeColors {
   glass: string;
   /** Rating star and favourite badges. */
   star: string;
+  /** Low-opacity lavender wash for policy cards and progress badges. */
+  lavenderTint: string;
   success: string;
+  successTint: string;
   error: string;
+  errorTint: string;
+  /** Warm wash behind the "Guest favorite" badge. */
+  starTint: string;
+  /** Cool wash behind the "Superhost" badge. */
+  infoTint: string;
 }
 
 export const lightColors: ThemeColors = {
@@ -53,11 +61,16 @@ export const lightColors: ThemeColors = {
   border: "#E5E7EB",
   glass: "rgba(255, 255, 255, 0.7)",
   star: "#FFC629",
+  lavenderTint: "#F4E8FD",
   success: "#0E7A54",
+  successTint: "#E3F5EC",
   error: "#D92D20",
+  errorTint: "#FDECEB",
+  starTint: "#FDF1D6",
+  infoTint: "#E6EEFB",
 };
 
-const darkColors: ThemeColors = {
+export const darkColors: ThemeColors = {
   primary: "#FFC629",
   onPrimary: "#0B0B1A",
   lavender: "#D8A6F8",
@@ -69,8 +82,13 @@ const darkColors: ThemeColors = {
   border: "#2A2A3F",
   glass: "rgba(23, 23, 42, 0.7)",
   star: "#FFC629",
+  lavenderTint: "#2A1F3D",
   success: "#3DDC9A",
+  successTint: "#12312A",
   error: "#FF7A70",
+  errorTint: "#3A1C1C",
+  starTint: "#3A2F14",
+  infoTint: "#1A2438",
 };
 
 export type ColorToken = keyof ThemeColors;
