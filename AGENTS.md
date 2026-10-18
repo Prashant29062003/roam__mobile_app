@@ -7,12 +7,12 @@ This file is the project's memory: it holds every decision that is still true. P
 ## Commands
 
 ```bash
-npx expo install <package>  # ALWAYS use instead of npm install: resolves SDK-compatible versions
+./node_modules/.bin/expo install <package> # ALWAYS use instead of npm install: resolves SDK-compatible versions. Not `npx`: npm 12 rejects the `--allow-scripts` that npx injects, so any nested `npm install` dies with EALLOWSCRIPTS. npm 12 also skips dependency install scripts unless the package is listed in `allowScripts` (ours lists `@tailwindcss/oxide` and `unrs-resolver`), and a package.json `allowScripts` overrides the user's global `.npmrc` one.
 npx expo start              # dev server (press i for the iOS simulator)
-npx expo lint               # lint
+npx expo lint               # lint (uses eslint.config.js, created by `expo lint`)
 npx tsc --noEmit            # type check
 npx expo-doctor             # diagnose dependency and config issues
-npx expo install --fix      # fix incompatible package versions
+./node_modules/.bin/expo install --fix # fix incompatible package versions
 npx eas-cli@latest <cmd>    # EAS builds, submits, and updates (use instead of bare `eas`)
 ```
 
@@ -22,7 +22,7 @@ npx eas-cli@latest <cmd>    # EAS builds, submits, and updates (use instead of b
 - Routes live in `src/app/`: every file is a screen and `_layout.tsx` files define navigators. API routes are `src/app/api/*+api.ts`. Keep components, hooks, and utils outside `src/app/`.
 - `ios/` and `android/` are generated. Never create or edit them by hand; configure native behavior in `app.json` and config plugins.
 - Expo Go only includes its bundled native modules. After adding a library with native code, switch to a development build (`npx expo run:ios`).
-- Styling is NativeWind v5 (`className`) on Tailwind v4, configured CSS-first in `src/global.css` (imported once in `src/app/_layout.tsx`). Docs: https://www.nativewind.dev/v5/llms-full.txt. Keep `nativewind` and `react-native-css` pinned as a matching RC pair, and `tailwindcss`, `@tailwindcss/postcss`, and `lightningcss` (plus its `overrides` entry) pinned exactly. Metro's `withNativewind` does the transform, so there is no `babel.config.js`. Use `useColorScheme` from `react-native`, not `nativewind`.
+- Styling is NativeWind v5 (`className`) on Tailwind v4, configured CSS-first in `src/global.css` (imported once in `src/app/_layout.tsx`). Docs: https://www.nativewind.dev/v5/llms-full.txt. Keep `nativewind` and `react-native-css` pinned as a matching RC pair, and `tailwindcss`, `@tailwindcss/postcss`, and `lightningcss` (plus its `overrides` entry) pinned exactly. Metro's `withNativewind` does the transform, so there is no `babel.config.js`; the pipeline is `postcss.config.mjs` (`@tailwindcss/postcss`) + `metro.config.js` (`withNativewind(config)`, lowercase w) + a committed `nativewind-env.d.ts` (`/// <reference types="react-native-css/types" />`). Tailwind finds classes by scanning from `src/global.css`, so anything outside `src/` needs `@source`; `@import "nativewind/theme"` is what supplies the `ios:`/`android:`/`native:`/`web:` variants and platform fonts. Check class generation without Metro with `npx @tailwindcss/cli@4.1.12 --input ./src/global.css --output ./tw-check.css`. Use `useColorScheme` from `react-native`, not `nativewind`.
 
 ## Who owns what
 
