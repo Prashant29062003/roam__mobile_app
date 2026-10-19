@@ -84,21 +84,32 @@ both halves, and recorded the category glyph choices.
 
 ## Result
 
-Built. The theme switch now writes both halves through `applyColorScheme()`,
-which is the fix behind every "icon is invisible" report; the tab bar is
-vertical per the design; Cabins and Beach use the designed glyphs; chips,
-badges and alerts centre their content; and the four page-layout clipping bugs
-are gone.
+Built. `ThemeProvider` now supplies the active scheme's `--roam-*` variables
+through react-native-css's `VariableContextProvider`, driven by
+`useColorScheme()`; the tab bar is vertical per the design; Cabins and Beach
+use the designed glyphs; chips, badges and alerts centre their content; the
+four page-layout clipping bugs are gone; and the web crash is gone.
 
-**Web crash fixed, native still undiagnosed.** `applyColorScheme()` feature-
-detects `Appearance.setColorScheme` and returns `false` where it is missing
-rather than throwing, which resolves the `Appearance.default.setColorScheme is
-not a function` crash. The switch doing nothing on the phone is **not** fixed
-and is not claimed to be: a temporary `Diagnostics` panel is now mounted at the
-top of `/design-system` and reports each layer separately, because two fixes
-have now been applied and neither was verified on a device. Read that panel
-before changing anything else.
+**The real bug was not the switch.** A diagnostic panel proved it: with the
+device in dark mode and `System` selected, `Appearance.getColorScheme()`,
+`useColorScheme()` and react-native-css's `colorScheme.get()` all reported
+`dark` while the page rendered light. The `@media (prefers-color-scheme: dark)`
+block was compiling and shipping, but never applied to `:root` custom
+properties on Android. The switch only ever looked broken because the CSS half
+it was meant to move was pinned to light. That block is deleted; `:root` in
+`global.css` is now the light default only.
 
-Verified at compile and bundle level only: type check, lint, doctor 20/20, both
-platform exports. Nothing visual has been checked — **dark mode has still never
-been seen rendering**, and the capsule centring change remains a hypothesis.
+The invisible icons were the same bug seen from the other side: `useColorScheme()`
+correctly reported dark, so `useThemeColors()` returned `foreground: #F5F5F7`,
+and those white icons were painted on a white page.
+
+One scheme value remains — `useColorScheme()`. `applyColorScheme()` calls only
+`Appearance.setColorScheme`, which the diagnostic proved does work on Android;
+calling react-native-css's `colorScheme.set()` as well was redundant and is
+what crashed on web.
+
+Verified at compile and bundle level: type check, lint, doctor 20/20, Android
+and web exports, `prefers-color-scheme` gone from the compiled CSS, and the
+dark values (`#17172A`, `#D8A6F8`) present in the Android bundle. **Still
+unverified on a device** — this whole diagnosis rests on the user's diagnostic
+screenshots, not on anything this machine could render.

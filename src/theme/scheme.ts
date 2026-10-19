@@ -1,5 +1,4 @@
 import { Appearance as AppearanceImport } from "react-native";
-import { colorScheme } from "react-native-css";
 
 export type Scheme = "light" | "dark" | "system";
 
@@ -20,18 +19,21 @@ export const appearanceInfo = {
 };
 
 /**
- * Forces both theme halves to the same value.
+ * Forces the app's color scheme.
  *
- * Returns `false` when the platform cannot override the scheme at all.
- * react-native-web has no `Appearance.setColorScheme`, and react-native-css's
- * web implementation calls that same missing method — so on web neither half
- * works and there is nothing to do. That is not a split: on web both halves
- * read the browser's `prefers-color-scheme` and agree with each other.
+ * This is now the *only* scheme switch the app needs. `ThemeProvider` derives
+ * the CSS variables from `useColorScheme()`, and everything read through that
+ * hook (icon tints, `Switch`, glass) already follows it — so one call moves
+ * both halves. Calling react-native-css's `colorScheme.set()` as well was
+ * redundant, and on web it invoked the very method react-native-web lacks.
+ *
+ * Returns `false` when the platform cannot override at all, which is web:
+ * react-native-web has no `Appearance.setColorScheme`. There both halves read
+ * the browser's `prefers-color-scheme` and agree, so a no-op is correct.
  */
 export function applyColorScheme(value: Scheme): boolean {
   if (!appearanceInfo.canOverride) return false;
 
   appearance.setColorScheme(value === "system" ? "unspecified" : value);
-  colorScheme.set(value === "system" ? null : value);
   return true;
 }

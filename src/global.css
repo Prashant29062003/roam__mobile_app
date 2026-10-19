@@ -14,10 +14,10 @@
  *
  * Source of truth: assets/images/prompt-imgs/prompt-imgs/design.png
  *
- * The `@theme` block only *maps* `--color-*` onto the switchable `--roam-*`
- * values declared in `:root` below. Light and dark are therefore a single
- * token set that flips with the system appearance, rather than a `dark:`
- * twin that every call site has to remember.
+ * The `@theme` block below only *maps* `--color-*` onto the switchable
+ * `--roam-*` values. Light lives in `:root`; dark is supplied at runtime by
+ * <ThemeProvider /> (see src/theme/variables.ts), which keeps both halves of
+ * the theme reading from one value.
  */
 @theme {
   /* Brand ---------------------------------------------------------------- */
@@ -90,6 +90,18 @@
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
 }
 
+/*
+ * The `:root` block below is the LIGHT scheme, and is only the default for
+ * anything rendered before <ThemeProvider /> — web SSR, mostly.
+ *
+ * Dark mode deliberately does NOT live here as an
+ * `@media (prefers-color-scheme: dark)` override. That block compiled and
+ * shipped, but never applied to `:root` custom properties on Android: the
+ * device reported `dark`, and the page still rendered light. Instead
+ * `src/theme/variables.ts` holds both schemes and `ThemeProvider` supplies the
+ * right set through react-native-css's `VariableContextProvider`, driven by
+ * `useColorScheme()`. Keep this block in step with `colors.ts`.
+ */
 :root {
   --roam-primary: #ffc629;
   --roam-lavender: #c984f4;
@@ -110,28 +122,4 @@
   --roam-error-tint: #fdeceb;
   --roam-star-tint: #fdf1d6;
   --roam-info-tint: #e6eefb;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --roam-primary: #ffc629;
-    --roam-lavender: #d8a6f8;
-    --roam-on-primary: #0b0b1a;
-    --roam-on-lavender: #0b0b1a;
-
-    --roam-background: #0b0b1a;
-    --roam-surface: #17172a;
-    --roam-foreground: #f5f5f7;
-    --roam-muted: #9ca3af;
-    --roam-border: #2a2a3f;
-
-    --roam-lavender-tint: #2a1f3d;
-    --roam-glass: rgba(23, 23, 42, 0.7);
-    --roam-success: #3ddc9a;
-    --roam-success-tint: #12312a;
-    --roam-error: #ff7a70;
-    --roam-error-tint: #3a1c1c;
-    --roam-star-tint: #3a2f14;
-    --roam-info-tint: #1a2438;
-  }
 }
