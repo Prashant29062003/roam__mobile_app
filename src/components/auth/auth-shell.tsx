@@ -31,7 +31,7 @@ export function AuthShell({ title, subtitle, footer, children }: AuthShellProps)
   const insets = useSafeAreaInsets();
 
   return (
-    <View className="flex-1 bg-background">
+    <View className="flex-1 bg-surface">
       <StatusBar style="auto" />
 
       <View

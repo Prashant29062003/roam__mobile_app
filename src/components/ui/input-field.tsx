@@ -30,12 +30,20 @@ const errorBorders = {
   password: "border-error",
 } as const;
 
+const defaultBorders = {
+  search: "border-border",
+  form: "border-border",
+  password: "border-border",
+} as const;
+
 export type InputVariant = keyof typeof fieldContainers;
 
 export type InputFieldProps = Omit<TextInputProps, "className"> & {
   variant?: InputVariant;
   /** Leading glyph, e.g. search, person, or lock. */
   icon?: IconName;
+  /** Label rendered above the placeholder inside the same field box. */
+  label?: string;
   /** Trailing glyph that is not itself interactive. */
   trailingIcon?: IconName;
   /** Trailing control that the caller wants to handle, e.g. open filters. */
@@ -51,12 +59,14 @@ export type InputFieldProps = Omit<TextInputProps, "className"> & {
  * border and caret, error as a red one — no other decoration, so the state is
  * obvious without a floating label.
  *
- * The password variant owns its own reveal toggle; every other variant takes an
- * optional trailing control.
+ * When a `label` is given, it sits above the placeholder inside the same
+ * rounded box, so the box grows to hold both lines. The password variant owns
+ * its own reveal toggle; every other variant takes an optional trailing control.
  */
 export function InputField({
   variant = "form",
   icon,
+  label,
   trailingIcon,
   onTrailingPress,
   trailingAccessibilityLabel,
@@ -85,49 +95,63 @@ export function InputField({
     ? errorBorders[variant]
     : focused
       ? focusBorders[variant]
-      : "border-transparent";
+      : defaultBorders[variant];
+
+  const trailingPressable = trailing && trailingHandler ? (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={
+        isPassword
+          ? revealed
+            ? "Hide password"
+            : "Show password"
+          : (trailingAccessibilityLabel ?? "Field action")
+      }
+      onPress={trailingHandler}
+      hitSlop={8}
+    >
+      <Icon name={trailing} size={20} tone="foreground" />
+    </Pressable>
+  ) : null;
+
+  const input = (
+    <TextInput
+      className={`flex-1 text-field text-foreground ${label ? "py-xs" : ""}`}
+      placeholderTextColor="#6B7280"
+      editable={editable}
+      secureTextEntry={isPassword ? !revealed : secureTextEntry}
+      accessibilityLabel={props.accessibilityLabel ?? props.placeholder}
+      onFocus={(event) => {
+        setFocused(true);
+        props.onFocus?.(event);
+      }}
+      onBlur={(event) => {
+        setFocused(false);
+        props.onBlur?.(event);
+      }}
+      {...props}
+      style={style}
+    />
+  );
 
   return (
     <View className="w-full gap-xs">
-      <View
-        className={`h-14 flex-row items-center gap-sm border ${borderClass} bg-background ${fieldContainers[variant]}`}
-      >
-        {icon ? <Icon name={icon} size={20} tone="foreground" /> : null}
-
-        <TextInput
-          className="flex-1 text-field text-foreground"
-          placeholderTextColor="#6B7280"
-          editable={editable}
-          secureTextEntry={isPassword ? !revealed : secureTextEntry}
-          accessibilityLabel={props.accessibilityLabel ?? props.placeholder}
-          onFocus={(event) => {
-            setFocused(true);
-            props.onFocus?.(event);
-          }}
-          onBlur={(event) => {
-            setFocused(false);
-            props.onBlur?.(event);
-          }}
-          {...props}
-          style={style}
-        />
-
-        {trailing && trailingHandler ? (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={
-              isPassword
-                ? revealed
-                  ? "Hide password"
-                  : "Show password"
-                : (trailingAccessibilityLabel ?? "Field action")
-            }
-            onPress={trailingHandler}
-            hitSlop={8}
-          >
-            <Icon name={trailing} size={20} tone="foreground" />
-          </Pressable>
-        ) : null}
+      <View className={`border rounded-control bg-background px-md ${borderClass}`}>
+        {label ? (
+          <View className="flex-row items-center gap-sm py-sm">
+            {icon ? <Icon name={icon} size={20} tone="foreground" /> : null}
+            <ThemedText variant="caption" tone="muted" className="flex-1">
+              {label}
+            </ThemedText>
+            {trailingPressable}
+          </View>
+        ) : (
+          <View className="flex-row items-center gap-sm h-14 py-sm">
+            {icon ? <Icon name={icon} size={20} tone="foreground" /> : null}
+            {trailingPressable}
+          </View>
+        )}
+        {input}
       </View>
 
       {error && errorMessage ? (

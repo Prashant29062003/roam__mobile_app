@@ -39,7 +39,7 @@ export type Credentials = {
  * banner and leaving the user to find the offending box.
  */
 export type AuthError = {
-  field: "email" | "password" | "fullName";
+  field: "email" | "password" | "fullName" | "code";
   message: string;
 };
 
@@ -53,6 +53,7 @@ type SessionContextValue = {
   isLoading: boolean;
   signIn: (credentials: Credentials) => Promise<AuthResult>;
   signUp: (credentials: Credentials) => Promise<AuthResult>;
+  verifyCode: (input: { email: string; code: string }) => Promise<AuthResult>;
   signOut: () => void;
 };
 
@@ -86,49 +87,98 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
+  // Email awaiting email-code verification after sign-up. Clerk replaces this
+  // with its own verification flow; the mock keeps it so the verify screen has
+  // something real to check the code against.
+  const [pending, setPending] = useState<{
+    email: string;
+    fullName?: string;
+  } | null>(null);
   // Starts false because there is nothing to read yet. Clerk turns this into a
   // real async read of the token cache, at which point it starts true and the
   // splash controller in `src/app/_layout.tsx` waits on it as intended.
   const [isLoading] = useState(false);
 
   const authenticate = useCallback(
-    async (
-      credentials: Credentials,
-      fullName: string | undefined,
-    ): Promise<AuthResult> => {
+    async (credentials: Credentials): Promise<AuthError | null> => {
       await wait(NETWORK_DELAY_MS);
-
-      const error = validate(credentials);
-      if (error) {
-        return { ok: false, error };
-      }
-
-      setSession({
-        userId: `mock_${credentials.email.trim().toLowerCase()}`,
-        email: credentials.email.trim().toLowerCase(),
-        fullName,
-      });
-      return { ok: true };
+      return validate(credentials);
     },
     [],
   );
 
+  const verifyCode = useCallback(
+    async (input: { email: string; code: string }): Promise<AuthResult> => {
+      await wait(NETWORK_DELAY_MS);
+
+      const { email, code } = input;
+      if (!/^\d{6}$/.test(code.trim())) {
+        return {
+          ok: false,
+          error: { field: "code", message: "Enter a 6-digit code" },
+        };
+      }
+      if (
+        !pending ||
+        email.trim().toLowerCase() !== pending.email
+      ) {
+        return {
+          ok: false,
+          error: {
+            field: "email",
+            message: "That email doesn't match the sign-up you started.",
+          },
+        };
+      }
+
+      setSession({
+        userId: `mock_${pending.email}`,
+        email: pending.email,
+        fullName: pending.fullName,
+      });
+      setPending(null);
+      return { ok: true };
+    },
+    [pending],
+  );
+
   const signIn = useCallback(
-    (credentials: Credentials) => authenticate(credentials, undefined),
+    async (credentials: Credentials): Promise<AuthResult> => {
+      const error = await authenticate(credentials);
+      if (error) {
+        return { ok: false, error };
+      }
+      setSession({
+        userId: `mock_${credentials.email.trim().toLowerCase()}`,
+        email: credentials.email.trim().toLowerCase(),
+      });
+      return { ok: true };
+    },
     [authenticate],
   );
 
   const signUp = useCallback(
-    (credentials: Credentials) =>
-      authenticate(credentials, credentials.fullName?.trim()),
+    async (credentials: Credentials): Promise<AuthResult> => {
+      // Sign-up defers session creation until the email code is verified, so
+      // the flow lands on the verify screen instead of straight into /home.
+      const error = await authenticate(credentials);
+      if (error) {
+        return { ok: false, error };
+      }
+      setPending({
+        email: credentials.email.trim().toLowerCase(),
+        fullName: credentials.fullName?.trim(),
+      });
+      return { ok: true };
+    },
     [authenticate],
   );
 
   const signOut = useCallback(() => setSession(null), []);
 
   const value = useMemo(
-    () => ({ session, isLoading, signIn, signUp, signOut }),
-    [session, isLoading, signIn, signUp, signOut],
+    () => ({ session, isLoading, signIn, signUp, verifyCode, signOut }),
+    [session, isLoading, signIn, signUp, verifyCode, signOut],
   );
 
   return (

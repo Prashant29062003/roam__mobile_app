@@ -1,11 +1,12 @@
-import { useState } from "react";
 import { View } from "react-native";
 import { router } from "expo-router";
 
 import { AuthShell, AuthSwitch } from "@/components/auth/auth-shell";
 import { Button, InputField } from "@/components/ui";
 import { useSession, type AuthError } from "@/auth/session";
+import { useState } from "react";
 
+/** Keyed by `AuthError["field"]` so each message lands on the box that caused it. */
 type FieldErrors = Partial<Record<AuthError["field"], string>>;
 
 export default function SignIn() {
@@ -44,9 +45,10 @@ export default function SignIn() {
       <View className="gap-md">
         <InputField
           icon="mail"
+          label="Email address"
           value={email}
           onChangeText={setEmail}
-          placeholder="Email address"
+          placeholder="you@example.com"
           keyboardType="email-address"
           autoCapitalize="none"
           autoCorrect={false}
@@ -57,6 +59,8 @@ export default function SignIn() {
         />
         <InputField
           variant="password"
+          icon="lock"
+          label="Password"
           value={password}
           onChangeText={setPassword}
           placeholder="At least 8 characters"

@@ -1,10 +1,12 @@
-import { useState } from "react";
-import { View } from "react-native";
+import { Alert, View } from "react-native";
 import { router } from "expo-router";
 
 import { AuthShell, AuthSwitch } from "@/components/auth/auth-shell";
-import { Button, InputField } from "@/components/ui";
+import { GoogleMark } from "@/components/brand/google-mark";
+import { Button, InputField, ThemedText } from "@/components/ui";
 import { useSession, type AuthError } from "@/auth/session";
+import { useState } from "react";
+import AppleMark from "@/components/brand/apple-mark";
 
 /** Keyed by `AuthError["field"]` so each message lands on the box that caused it. */
 type FieldErrors = Partial<Record<AuthError["field"], string>>;
@@ -28,7 +30,11 @@ export default function SignUp() {
       return;
     }
 
-    router.replace("/home");
+    router.replace(`/verify-email?email=${encodeURIComponent(email)}`);
+  };
+
+  const onSocial = () => {
+    Alert.alert("Not available yet", "This sign-in method isn't connected yet.");
   };
 
   return (
@@ -46,9 +52,10 @@ export default function SignUp() {
       <View className="gap-md">
         <InputField
           icon="person"
+          label="Full name"
           value={fullName}
           onChangeText={setFullName}
-          placeholder="Full name"
+          placeholder="e.g. Adrian Hajdin"
           autoComplete="name"
           textContentType="name"
           error={!!errors.fullName}
@@ -56,9 +63,10 @@ export default function SignUp() {
         />
         <InputField
           icon="mail"
+          label="Email address"
           value={email}
           onChangeText={setEmail}
-          placeholder="Email address"
+          placeholder="you@example.com"
           keyboardType="email-address"
           autoCapitalize="none"
           autoCorrect={false}
@@ -69,6 +77,8 @@ export default function SignUp() {
         />
         <InputField
           variant="password"
+          icon="lock"
+          label="Password"
           value={password}
           onChangeText={setPassword}
           placeholder="At least 8 characters"
@@ -85,6 +95,27 @@ export default function SignUp() {
           trailingIcon="arrowRight"
           loading={loading}
           onPress={onSubmit}
+        />
+
+        <View className="flex-row items-center gap-sm my-sm">
+          <View className="flex-1 border-t border-border" />
+          <ThemedText variant="caption" tone="muted">or</ThemedText>
+          <View className="flex-1 border-t border-border" />
+        </View>
+
+        <Button
+          title="Continue with Google"
+          variant="secondary"
+          size="md"
+          leading={<GoogleMark size={20} />}
+          onPress={onSocial}
+        />
+        <Button
+          title="Continue with Apple"
+          variant="secondary"
+          size="md"
+          leading={<AppleMark size={20} />}
+          onPress={onSocial}
         />
       </View>
     </AuthShell>
