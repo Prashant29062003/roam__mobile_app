@@ -35,6 +35,14 @@ export interface ThemeColors {
   border: string;
   /** Tab bar and other frosted surfaces. */
   glass: string;
+  /**
+   * Translucent dark fill for controls that sit on top of a photo, e.g. the
+   * location pill on onboarding. `glass` is its white counterpart; a control
+   * over imagery needs one or the other, never a hardcoded rgba.
+   */
+  scrim: string;
+  /** Text/icon color that sits on `scrim`. Fixed in both schemes. */
+  onScrim: string;
   /** Rating star and favourite badges. */
   star: string;
   /** Low-opacity lavender wash for policy cards and progress badges. */
@@ -60,6 +68,8 @@ export const lightColors: ThemeColors = {
   background: "#F4F5F7",
   border: "#E5E7EB",
   glass: "rgba(255, 255, 255, 0.7)",
+  scrim: "rgba(11, 11, 26, 0.55)",
+  onScrim: "#FFFFFF",
   star: "#FFC629",
   lavenderTint: "#F4E8FD",
   success: "#0E7A54",
@@ -81,6 +91,10 @@ export const darkColors: ThemeColors = {
   background: "#0B0B1A",
   border: "#2A2A3F",
   glass: "rgba(23, 23, 42, 0.7)",
+  // `scrim` sits on top of a photo, so it stays the same in both schemes —
+  // there is no light or dark version of "dim whatever is behind this".
+  scrim: "rgba(11, 11, 26, 0.55)",
+  onScrim: "#FFFFFF",
   star: "#FFC629",
   lavenderTint: "#2A1F3D",
   success: "#3DDC9A",

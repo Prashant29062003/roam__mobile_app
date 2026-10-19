@@ -28,9 +28,12 @@
   /* Text/icon colors that sit on a brand fill. `--color-on-primary` is fixed
    * across both schemes: the yellow fill is light enough in dark mode that its
    * label stays dark, which is what keeps the primary button legible either
-   * way. `--color-on-lavender` does flip, because lavender lightens in dark. */
+   * way. `--color-on-lavender` does flip, because lavender lightens in dark.
+   * `--color-on-scrim` is fixed too — a scrim is a dimmed photo, which looks
+   * the same over a light image as over a dark one. */
   --color-on-primary: var(--roam-on-primary);
   --color-on-lavender: var(--roam-on-lavender);
+  --color-on-scrim: var(--roam-on-scrim);
 
   /* Surfaces and text --------------------------------------------------- */
   --color-background: var(--roam-background);
@@ -42,6 +45,7 @@
   /* Tints, status, and glass --------------------------------------------- */
   --color-lavender-tint: var(--roam-lavender-tint);
   --color-glass: var(--roam-glass);
+  --color-scrim: var(--roam-scrim);
   --color-success: var(--roam-success);
   --color-success-tint: var(--roam-success-tint);
   --color-error: var(--roam-error);
@@ -60,6 +64,9 @@
   /* Radius --------------------------------------------------------------- */
   --radius-control: 12px;
   --radius-card: 16px;
+  /* The onboarding bottom sheet. First step above `card` — a sheet is a much
+   * larger surface, so it reads as a different shape, not a bigger card. */
+  --radius-sheet: 32px;
   --radius-full: 9999px;
 
   /* Typography ----------------------------------------------------------- *
@@ -70,12 +77,18 @@
    */
   --text-display: 56px;
   --text-display--line-height: 1;
+  /* Screen heroes — the onboarding headline and the auth screen heading. Sits
+   * between `heading` and `display` on purpose: 56 is the wordmark's step, and
+   * reusing it here would make the headline shout over the logotype. Sized off
+   * the onboarding design, measured at roughly 30px against 16px body. */
+  --text-hero: 32px;
+  --text-hero--line-height: 1.2;
   --text-heading: 28px;
   --text-heading--line-height: 1.2;
   --text-title: 22px;
   --text-title--line-height: 1.2;
   --text-body: 16px;
-  --text-body--line-height: 1.5;
+  --text-body--line-height: 1.3;
   --text-caption: 14px;
   --text-caption--line-height: 1.5;
   --text-button: 17px;
@@ -116,6 +129,8 @@
 
   --roam-lavender-tint: #f4e8fd;
   --roam-glass: rgba(255, 255, 255, 0.7);
+  --roam-scrim: rgba(11, 11, 26, 0.55);
+  --roam-on-scrim: #ffffff;
   --roam-success: #0e7a54;
   --roam-success-tint: #e3f5ec;
   --roam-error: #d92d20;

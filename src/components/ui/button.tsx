@@ -5,6 +5,8 @@ import {
   type ViewStyle,
 } from "react-native";
 
+import type { ReactNode } from "react";
+
 import { useThemeColors, type ColorToken } from "@/theme";
 import { Icon, type IconName } from "./icon";
 import { ThemedText, type TextTone } from "./themed-text";
@@ -43,11 +45,18 @@ export type ButtonProps = {
   title: string;
   variant?: ButtonVariant;
   size?: ButtonSize;
+  /**
+   * Slot before the label, for anything the `Icon` glyph set cannot express —
+   * a brand mark, a spinner, an avatar. Omit it and use `trailingIcon` for the
+   * common case of a glyph that is already in the set.
+   */
+  leading?: ReactNode;
   /** Trailing glyph, e.g. the arrow on the primary CTA. */
   trailingIcon?: IconName;
   loading?: boolean;
   disabled?: boolean;
   /** Merged last so callers can adjust layout without forking the variant. */
+  className?: string;
   style?: StyleProp<ViewStyle>;
   onPress?: () => void;
 };
@@ -61,9 +70,11 @@ export function Button({
   title,
   variant = "primary",
   size = "md",
+  leading,
   trailingIcon,
   loading,
   disabled,
+  className,
   style,
   onPress,
 }: ButtonProps) {
@@ -77,7 +88,7 @@ export function Button({
       accessibilityState={{ disabled: !!disabled, busy: !!loading }}
       disabled={inactive}
       onPress={onPress}
-      className={`flex-row items-center justify-center gap-sm rounded-full ${containers[variant]} ${sizes[size]}`}
+      className={`flex-row items-center justify-center gap-sm rounded-full ${containers[variant]} ${sizes[size]} ${className ?? ""}`}
       style={({ pressed }) => [
         { opacity: disabled ? 0.4 : pressed ? 0.7 : 1 },
         style,
@@ -89,6 +100,7 @@ export function Button({
         />
       ) : (
         <>
+          {leading}
           <ThemedText variant="button" tone={labelTones[variant]}>
             {title}
           </ThemedText>
@@ -109,6 +121,7 @@ export type IconButtonProps = {
   tone?: "default" | "lavender" | "primary";
   disabled?: boolean;
   /** Overrides the circular treatment for non-icon shapes. */
+  className?: string;
   style?: StyleProp<ViewStyle>;
   onPress?: () => void;
 };
@@ -126,6 +139,7 @@ export function IconButton({
   size = "md",
   tone = "default",
   disabled,
+  className,
   style,
   onPress,
 }: IconButtonProps) {
@@ -140,7 +154,7 @@ export function IconButton({
       accessibilityState={{ disabled: !!disabled }}
       disabled={disabled}
       onPress={onPress}
-      className="items-center justify-center rounded-full bg-background"
+      className={`items-center justify-center rounded-full bg-background ${className ?? ""}`}
       style={({ pressed }) => [
         {
           width: boxSize,

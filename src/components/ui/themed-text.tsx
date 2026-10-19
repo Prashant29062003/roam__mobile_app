@@ -9,6 +9,8 @@ import { Text, type TextProps } from "react-native";
  */
 const variants = {
   display: "text-display font-bold",
+  /** Screen heroes — onboarding and auth headings. Heavy and tight. */
+  hero: "text-hero font-extrabold tracking-tight",
   heading: "text-heading font-bold",
   title: "text-title font-bold",
   body: "text-body",
@@ -33,6 +35,8 @@ const tones = {
   onPrimary: "text-on-primary",
   /** For text sitting on the lavender fill. */
   onLavender: "text-on-lavender",
+  /** For text sitting on the scrim, e.g. the location pill over a photo. */
+  onScrim: "text-on-scrim",
 } as const;
 
 export type TextVariant = keyof typeof variants;

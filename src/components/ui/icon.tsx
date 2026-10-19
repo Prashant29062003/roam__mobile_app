@@ -21,6 +21,7 @@ const glyphs = {
   sliders: { ios: "slider.horizontal.3", android: "tune" },
   arrowRight: { ios: "arrow.right", android: "arrow_forward" },
   chevronRight: { ios: "chevron.right", android: "chevron_right" },
+  chevronLeft: { ios: "chevron.left", android: "chevron_left" },
   check: { ios: "checkmark", android: "check" },
   close: { ios: "xmark", android: "close" },
   alert: { ios: "exclamationmark.circle.fill", android: "error" },

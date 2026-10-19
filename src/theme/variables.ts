@@ -24,6 +24,8 @@ function toVariables(colors: ThemeColors) {
     "--roam-border": colors.border,
     "--roam-lavender-tint": colors.lavenderTint,
     "--roam-glass": colors.glass,
+    "--roam-scrim": colors.scrim,
+    "--roam-on-scrim": colors.onScrim,
     "--roam-success": colors.success,
     "--roam-success-tint": colors.successTint,
     "--roam-error": colors.error,
