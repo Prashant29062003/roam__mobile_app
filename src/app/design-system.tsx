@@ -25,6 +25,7 @@ import {
   TabBar,
   ThemedText,
   Toggle,
+  Wordmark,
   type IconName,
 } from "@/components/ui";
 import {
@@ -131,13 +132,30 @@ export default function DesignSystem() {
       contentContainerClassName="gap-xl p-md pb-xxl"
     >
       <View className="gap-sm">
-        <ThemedText variant="display">roam</ThemedText>
-        <ThemedText variant="caption" tone="muted">
-          Find unforgettable stays for every kind of trip.
-        </ThemedText>
+        <Wordmark tagline="Find unforgettable stays for every kind of trip." />
       </View>
 
       <Diagnostics />
+
+      <Section
+        title="Wordmark"
+        description="Set from the type ramp, not shipped as an image. The design's Geometric Sans is not bundled yet, so this renders in the platform sans."
+      >
+        <Frame>
+          <Field label="display" hint="56 / extrabold / tightest">
+            <Wordmark />
+          </Field>
+          <Field label="heading" hint="28 / extrabold / tight">
+            <Wordmark size="heading" />
+          </Field>
+          <Field label="title" hint="22 / extrabold / tight">
+            <Wordmark size="title" />
+          </Field>
+          <Field label="with tagline" hint="brand lockup, design sheet §01">
+            <Wordmark size="heading" tagline="Find unforgettable stays for every kind of trip." />
+          </Field>
+        </Frame>
+      </Section>
 
       <SegmentedControl
         options={[

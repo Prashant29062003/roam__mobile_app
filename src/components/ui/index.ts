@@ -11,3 +11,4 @@ export { Stepper, type StepperProps } from "./stepper";
 export { TabBar, type TabBarProps, type TabItem } from "./tab-bar";
 export { ThemedText, type TextTone, type TextVariant, type ThemedTextProps } from "./themed-text";
 export { Toggle, type ToggleProps } from "./toggle";
+export { Wordmark, type WordmarkProps, type WordmarkSize } from "./wordmark";
