@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
-import { colorScheme } from "react-native-css";
 
 import {
   Field,
@@ -10,6 +9,7 @@ import {
   Section,
   Swatch,
 } from "@/components/design-system/preview";
+import { Diagnostics } from "@/components/design-system/diagnostics";
 import {
   Badge,
   Button,
@@ -27,9 +27,14 @@ import {
   Toggle,
   type IconName,
 } from "@/components/ui";
-import { darkColors, lightColors, shadows, type ThemeColors } from "@/theme";
-
-type Scheme = "system" | "light" | "dark";
+import {
+  darkColors,
+  lightColors,
+  shadows,
+  applyColorScheme,
+  type Scheme,
+  type ThemeColors,
+} from "@/theme";
 
 const COLOR_ROWS = [
   { token: "primary", cls: "bg-primary", key: "primary" },
@@ -99,11 +104,25 @@ export default function DesignSystem() {
   const [tab, setTab] = useState<string>("home");
 
   // Leaving the page must not leave the whole app forced into a scheme.
-  useEffect(() => () => colorScheme.set(null), []);
+  useEffect(() => {
+    return () => {
+      applyColorScheme("system");
+    };
+  }, []);
 
+  /**
+   * `applyColorScheme` writes both halves — `Appearance` for everything read
+   * through `useColorScheme()` (icon tints, `Switch`, glass), and
+   * react-native-css's `colorScheme` for the `:root` variables behind every
+   * `className`. Setting only one is what left icons invisible on a light
+   * page.
+   *
+   * It returns `false` on platforms that cannot override at all (web), and
+   * there the switch is a no-op rather than a crash.
+   */
   const apply = (next: Scheme) => {
     setScheme(next);
-    colorScheme.set(next === "system" ? null : next);
+    applyColorScheme(next);
   };
 
   return (
@@ -117,6 +136,8 @@ export default function DesignSystem() {
           Find unforgettable stays for every kind of trip.
         </ThemedText>
       </View>
+
+      <Diagnostics />
 
       <SegmentedControl
         options={[
@@ -265,7 +286,7 @@ export default function DesignSystem() {
 
       <Section title="Chips" description="default, primary, lavender.">
         <Frame>
-          <View className="flex-row flex-wrap gap-sm">
+          <View className="flex-row flex-wrap items-center gap-sm">
             <Chip label="Cabins" icon="cabin" />
             <Chip label="Under $300" />
             <Chip label="All Stays" icon="home" variant="primary" selected />
@@ -273,7 +294,7 @@ export default function DesignSystem() {
             <Chip label="Small" size="sm" />
           </View>
           <Field label="interactive" hint="tap to toggle">
-            <View className="flex-row gap-sm">
+            <View className="flex-row items-center gap-sm">
               <Chip
                 label="Pet Friendly"
                 icon="heart"
@@ -360,9 +381,14 @@ export default function DesignSystem() {
         <Frame>
           <View className="flex-row flex-wrap gap-lg">
             {ICONS.map((name) => (
-              <View key={name} className="w-16 items-center gap-xs">
+              <View key={name} className="w-20 items-center gap-xs">
                 <Icon name={name} size={22} />
-                <ThemedText variant="caption" tone="muted" className="text-center">
+                <ThemedText
+                  variant="caption"
+                  tone="muted"
+                  className="text-center"
+                  numberOfLines={2}
+                >
                   {name}
                 </ThemedText>
               </View>

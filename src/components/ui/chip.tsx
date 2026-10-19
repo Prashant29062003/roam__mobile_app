@@ -41,6 +41,10 @@ export type ChipProps = {
  * Filter and category chips. The same primitive covers both the lavender
  * search filters and the yellow home categories — pick the variant, not a new
  * component.
+ *
+ * `leading-none` on the label: the caption ramp carries a 1.5 ratio, so a 14px
+ * label sits in a 21px line box and drifts off-centre against a 16px icon.
+ * Inside a capsule the line height has to match the glyph.
  */
 export function Chip({
   label,
@@ -57,7 +61,7 @@ export function Chip({
       accessibilityLabel={label}
       accessibilityState={{ selected: !!selected }}
       onPress={onPress}
-      className={`flex-row items-center gap-xs rounded-full ${containers[variant]} ${sizes[size]}`}
+      className={`flex-row items-center justify-center gap-xs rounded-full ${containers[variant]} ${sizes[size]}`}
       style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }, style]}
     >
       {icon ? (
@@ -76,7 +80,7 @@ export function Chip({
       <ThemedText
         variant="caption"
         tone={labelTones[variant]}
-        className="font-medium"
+        className="font-medium leading-none"
       >
         {label}
       </ThemedText>

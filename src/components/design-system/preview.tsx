@@ -56,12 +56,12 @@ export function Field({
 }) {
   return (
     <View className="gap-xs">
-      <View className="flex-row items-baseline gap-sm">
+      <View className="flex-row flex-wrap items-baseline gap-sm">
         <ThemedText variant="caption" tone="default">
           {label}
         </ThemedText>
         {hint ? (
-          <ThemedText variant="caption" tone="muted">
+          <ThemedText variant="caption" tone="muted" className="flex-1 shrink">
             {hint}
           </ThemedText>
         ) : null}
@@ -93,19 +93,15 @@ export function Swatch({
     <View className="flex-row items-center gap-md border-b border-border py-sm last:border-b-0">
       <View className={`h-12 w-12 shrink-0 rounded-control border border-border ${className}`} />
 
+      {/* One column, not two: a side-by-side hex column left the variable name
+          too little room and broke tokens mid-word ("--color-gla ss"). */}
       <View className="flex-1 gap-xs">
         <ThemedText variant="body">{token}</ThemedText>
         <ThemedText variant="caption" tone="muted">
           {variable}
         </ThemedText>
-      </View>
-
-      <View className="items-end gap-xs">
         <ThemedText variant="caption" tone="muted">
-          {light}
-        </ThemedText>
-        <ThemedText variant="caption" tone="muted">
-          {dark}
+          {light} · {dark}
         </ThemedText>
       </View>
     </View>

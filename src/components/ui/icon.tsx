@@ -33,8 +33,10 @@ const glyphs = {
   eye: { ios: "eye", android: "visibility" },
   eyeOff: { ios: "eye.slash", android: "visibility_off" },
   sparkle: { ios: "wand.and.stars", android: "auto_awesome" },
-  cabin: { ios: "house.lodge.fill", android: "holiday_village" },
-  beach: { ios: "beach.umbrella.fill", android: "beach_access" },
+  // Category glyphs follow the home design: a pine tree, a wave, a building,
+  // and a house for villas (no palm glyph exists in SF Symbols or Material).
+  cabin: { ios: "tree.fill", android: "park" },
+  beach: { ios: "water.waves", android: "waves" },
   city: { ios: "building.2.fill", android: "location_city" },
   villa: { ios: "house.lodge", android: "villa" },
 } as const satisfies Record<

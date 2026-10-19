@@ -43,16 +43,21 @@ export type BadgeProps = {
   icon?: IconName;
 };
 
-/** Small status pill — the tags from the design's tag sheet. */
+/**
+ * Small status pill — the tags from the design's tag sheet.
+ *
+ * `leading-none` on the label for the same reason as `Chip`: the caption ramp's
+ * 1.5 ratio leaves the glyphs sitting low in their line box next to the icon.
+ */
 export function Badge({ label, variant = "accent", icon }: BadgeProps) {
   return (
     <View
-      className={`flex-row items-center gap-xs self-start rounded-full px-sm py-xs ${containers[variant]}`}
+      className={`flex-row items-center justify-center gap-xs self-start rounded-full px-sm py-xs ${containers[variant]}`}
       accessibilityRole="text"
       accessibilityLabel={label}
     >
       {icon ? <Icon name={icon} size={12} tone={iconTones[variant]} /> : null}
-      <ThemedText variant="caption" tone={labelTones[variant]}>
+      <ThemedText variant="caption" tone={labelTones[variant]} className="leading-none">
         {label}
       </ThemedText>
     </View>

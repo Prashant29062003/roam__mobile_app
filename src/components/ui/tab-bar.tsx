@@ -51,8 +51,9 @@ export type TabBarProps<T extends string> = {
 };
 
 /**
- * The liquid-glass tab bar from the design: a frosted plate with the active
- * destination set into a yellow pill.
+ * The liquid-glass tab bar from the design: a frosted plate where the active
+ * destination sits in a yellow shape. The layout is **vertical** — icon above
+ * label, with the active shape wrapping both — per `home.png`.
  *
  * Rendered with `GlassView` so iOS 26 gets real Liquid Glass; on platforms
  * without it the component falls back to the flat `glass` token fill, which is
@@ -99,7 +100,7 @@ export function TabBar<T extends string>({
             accessibilityLabel={tab.label}
             accessibilityState={{ selected }}
             onPress={() => onChange(tab.value)}
-            className={`flex-1 flex-row items-center justify-center gap-xs rounded-full py-sm ${
+            className={`flex-1 flex-col items-center justify-center gap-xs rounded-full py-sm ${
               selected ? "bg-primary" : "bg-transparent"
             }`}
             style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}

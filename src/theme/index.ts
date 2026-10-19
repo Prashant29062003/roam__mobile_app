@@ -6,3 +6,4 @@ export {
   type ThemeColors,
 } from "./colors";
 export { shadows, type ShadowToken } from "./shadows";
+export { appearanceInfo, applyColorScheme, type Scheme } from "./scheme";
