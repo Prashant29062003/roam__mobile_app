@@ -34,7 +34,7 @@ export function Wordmark({ size = "display", tagline }: WordmarkProps) {
     <View className="gap-xs self-start">
       <ThemedText className={sizes[size]}>roam</ThemedText>
       {tagline ? (
-        <ThemedText variant="body" tone="muted" className="max-w-xs">
+        <ThemedText variant="body" tone="muted" className="">
           {tagline}
         </ThemedText>
       ) : null}
