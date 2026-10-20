@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Pressable,
   TextInput,
@@ -11,11 +11,11 @@ import { ThemedText } from "./themed-text";
 
 const fieldContainers = {
   /** Search — a wide pill with a leading glyph and an optional trailing action. */
-  search: "rounded-full px-md",
+  search: "rounded-full px-md min-h-[52px]",
   /** Form — a softer radius, taller, sits under a label. */
-  form: "rounded-control px-md",
+  form: "rounded-2xl px-md min-h-[64px]",
   /** Password — as form, with the reveal toggle. */
-  password: "rounded-control px-md",
+  password: "rounded-2xl px-md min-h-[64px]",
 } as const;
 
 const focusBorders = {
@@ -32,8 +32,8 @@ const errorBorders = {
 
 const defaultBorders = {
   search: "border-border",
-  form: "border-border",
-  password: "border-border",
+  form: "border-transparent",
+  password: "border-transparent",
 } as const;
 
 export type InputVariant = keyof typeof fieldContainers;
@@ -54,15 +54,6 @@ export type InputFieldProps = Omit<TextInputProps, "className"> & {
   errorMessage?: string;
 };
 
-/**
- * The single input surface from the design. Focus is expressed as a lavender
- * border and caret, error as a red one — no other decoration, so the state is
- * obvious without a floating label.
- *
- * When a `label` is given, it sits above the placeholder inside the same
- * rounded box, so the box grows to hold both lines. The password variant owns
- * its own reveal toggle; every other variant takes an optional trailing control.
- */
 export function InputField({
   variant = "form",
   icon,
@@ -77,14 +68,16 @@ export function InputField({
   style,
   ...props
 }: InputFieldProps) {
+  const inputRef = useRef<TextInput>(null);
   const [focused, setFocused] = useState(false);
   const [revealed, setRevealed] = useState(false);
 
   const isPassword = variant === "password";
+  // In auth.png & design.png (05), the default unrevealed state shows the slashed eye ("eyeOff")
   const trailing = isPassword
     ? revealed
-      ? "eyeOff"
-      : "eye"
+      ? "eye"
+      : "eyeOff"
     : trailingIcon;
 
   const trailingHandler = isPassword
@@ -97,65 +90,87 @@ export function InputField({
       ? focusBorders[variant]
       : defaultBorders[variant];
 
-  const trailingPressable = trailing && trailingHandler ? (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={
-        isPassword
-          ? revealed
-            ? "Hide password"
-            : "Show password"
-          : (trailingAccessibilityLabel ?? "Field action")
-      }
-      onPress={trailingHandler}
-      hitSlop={8}
-    >
-      <Icon name={trailing} size={20} tone="foreground" />
-    </Pressable>
+  const trailingElement = trailing ? (
+    trailingHandler ? (
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={
+          isPassword
+            ? revealed
+              ? "Hide password"
+              : "Show password"
+            : (trailingAccessibilityLabel ?? "Field action")
+        }
+        onPress={trailingHandler}
+        hitSlop={12}
+        className="ml-sm justify-center items-center"
+      >
+        <Icon name={trailing} size={22} tone="foreground" />
+      </Pressable>
+    ) : (
+      <View className="ml-sm justify-center items-center">
+        <Icon name={trailing} size={22} tone="foreground" />
+      </View>
+    )
   ) : null;
-
-  const input = (
-    <TextInput
-      className={`flex-1 text-field text-foreground ${label ? "py-xs" : ""}`}
-      placeholderTextColor="#6B7280"
-      editable={editable}
-      secureTextEntry={isPassword ? !revealed : secureTextEntry}
-      accessibilityLabel={props.accessibilityLabel ?? props.placeholder}
-      onFocus={(event) => {
-        setFocused(true);
-        props.onFocus?.(event);
-      }}
-      onBlur={(event) => {
-        setFocused(false);
-        props.onBlur?.(event);
-      }}
-      {...props}
-      style={style}
-    />
-  );
 
   return (
     <View className="w-full gap-xs">
-      <View className={`border rounded-control bg-background px-md ${borderClass}`}>
-        {label ? (
-          <View className="flex-row items-center gap-sm py-sm">
-            {icon ? <Icon name={icon} size={20} tone="foreground" /> : null}
-            <ThemedText variant="caption" tone="muted" className="flex-1">
+      <Pressable
+        onPress={() => editable && inputRef.current?.focus()}
+        className={`flex-row items-center border-[1.5px] bg-background ${fieldContainers[variant]} ${borderClass} ${
+          label ? "py-2.5" : "py-2"
+        }`}
+      >
+        {/* Leading Icon — Vertically centered */}
+        {icon ? (
+          <View className="mr-3.5 justify-center items-center">
+            <Icon name={icon} size={22} tone="foreground" />
+          </View>
+        ) : null}
+
+        {/* Center Stack: Dark Label on top + Muted/Foreground TextInput below */}
+        <View className="flex-1 justify-center">
+          {label ? (
+            <ThemedText
+              variant="caption"
+              tone="foreground"
+              className="font-medium text-[14px] leading-tight mb-0.5"
+            >
               {label}
             </ThemedText>
-            {trailingPressable}
-          </View>
-        ) : (
-          <View className="flex-row items-center gap-sm h-14 py-sm">
-            {icon ? <Icon name={icon} size={20} tone="foreground" /> : null}
-            {trailingPressable}
-          </View>
-        )}
-        {input}
-      </View>
+          ) : null}
+
+          <TextInput
+            ref={inputRef}
+            className="text-foreground text-[15px] p-0 m-0 leading-snug"
+            placeholderTextColor="#9CA3AF"
+            selectionColor="#C9B4FF"
+            cursorColor="#C9B4FF"
+            editable={editable}
+            secureTextEntry={isPassword ? !revealed : secureTextEntry}
+            accessibilityLabel={
+              props.accessibilityLabel ?? label ?? props.placeholder
+            }
+            onFocus={(event) => {
+              setFocused(true);
+              props.onFocus?.(event);
+            }}
+            onBlur={(event) => {
+              setFocused(false);
+              props.onBlur?.(event);
+            }}
+            {...props}
+            style={[{ paddingVertical: 0 }, style]}
+          />
+        </View>
+
+        {/* Trailing Icon / Password Toggle */}
+        {trailingElement}
+      </Pressable>
 
       {error && errorMessage ? (
-        <ThemedText variant="caption" tone="error">
+        <ThemedText variant="caption" tone="error" className="px-xs">
           {errorMessage}
         </ThemedText>
       ) : null}

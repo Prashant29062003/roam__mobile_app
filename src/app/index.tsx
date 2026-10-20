@@ -3,23 +3,28 @@ import {
   Alert,
   FlatList,
   StyleSheet,
+  Text,
   useWindowDimensions,
   View,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
 } from "react-native";
+import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Svg, { Path } from "react-native-svg";
+import { useThemeColors } from "@/theme";
 
 import { GoogleMark } from "@/components/brand/google-mark";
 import { PageDots } from "@/components/onboarding/page-dots";
 import { SlideCopy } from "@/components/onboarding/slide-copy";
 import { useSteadyHeight } from "@/components/onboarding/use-steady-height";
-import { Button, Icon, ThemedText, Wordmark } from "@/components/ui";
+import { Button, Icon, Wordmark } from "@/components/ui";
 import { onboardingSlides } from "@/data/onboarding-slides";
 import { shadows } from "@/theme";
+import { useAppTheme } from "@/components/theme-provider";
 
 /** `--spacing-sm`, which cannot ride along in a `className` next to a runtime inset. */
 const GUTTER = 8;
@@ -30,11 +35,7 @@ export default function Onboarding() {
   const [index, setIndex] = useState(0);
   const { steadyHeight, record } = useSteadyHeight();
 
-  // Every photo is fetched up front, because a swipe into a half-loaded page is
-  // what read as a flash: the outgoing photo was there, the incoming one was
-  // not, and the light background showed through the gap. Nothing is swipeable
-  // until the set has landed, and a failure never blocks — one dead photo
-  // should not strand the carousel.
+  // Every photo is fetched up front to prevent flashing during swipes.
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -66,12 +67,15 @@ export default function Onboarding() {
     }
   };
 
+  // Inside Onboarding():
+  const { scheme } = useAppTheme();
+  const colors = useThemeColors();
+
   return (
     <View className="flex-1 bg-background">
-      <StatusBar style="dark" />
+      <StatusBar style={scheme === "dark" ? "light" : "dark"} />
 
-      {/* `bg-scrim` rather than the app background: it only shows in the gaps
-          between pages during a swipe, where a light rectangle would flash. */}
+      {/* Carousel Section */}
       <View className="flex-1 bg-scrim">
         <FlatList
           data={onboardingSlides}
@@ -84,12 +88,6 @@ export default function Onboarding() {
                 style={{ flex: 1 }}
                 contentFit="cover"
                 cachePolicy="memory-disk"
-                // No fade transition. On a full-bleed background a 250ms
-                // fade-in is indistinguishable from a flash; the blurhash
-                // covers the gap instead, and prefetch means the swap is
-                // usually a cache hit.
-                // Decorative: the slide's copy is the content, and a photo
-                // behind it adds nothing a screen reader can use.
                 accessible={false}
                 accessibilityElementsHidden
                 importantForAccessibility="no-hide-descendants"
@@ -103,6 +101,7 @@ export default function Onboarding() {
           onMomentumScrollEnd={onScrollEnd}
         />
 
+        {/* Top Header: Wordmark & Skip Button */}
         <View
           className="absolute inset-x-0 top-0 flex-row items-center justify-between px-lg"
           style={{ paddingTop: insets.top + GUTTER }}
@@ -117,17 +116,44 @@ export default function Onboarding() {
           />
         </View>
 
-        <View className="absolute inset-x-0 bottom-0 px-lg pb-lg">
-          <View className="flex-row items-center gap-sm self-start rounded-full bg-scrim px-md py-sm">
-            <Icon name="location" size={16} tone="onScrim" />
-            <ThemedText variant="caption" tone="onScrim">
-              {slide.location}
-            </ThemedText>
-          </View>
+        {/* Location Badge with Glassmorphism */}
+        <View className="absolute inset-x-0 bottom-6 px-lg pb-lg">
+          <BlurView
+            intensity={50}
+            tint="dark"
+            className="flex-row items-center gap-sm self-start rounded-full px-4 py-2 border border-white/20 overflow-hidden"
+          >
+            <Icon name="location" size={16} tone="onScrim" color="#FFFFFF" />
+            {/* Using ThemedText inside the glass pill */}
+            <View>
+              <Text className="text-white text-xs font-medium">
+                {slide.location}
+              </Text>
+            </View>
+          </BlurView>
         </View>
       </View>
 
-      <View className="rounded-t-sheet bg-surface px-lg pt-lg" style={shadows.overlay}>
+      {/* Bottom Sheet Container */}
+      <View className="bg-surface relative px-lg pt-sm" style={shadows.overlay}>
+        {/* Organic Wavy Top SVG matching onboarding_2.png */}
+        <View
+          className="absolute left-0 right-0 bottom-full overflow-hidden pointer-events-none"
+          style={{ height: 48 }}
+        >
+          <Svg
+            viewBox="0 0 375 48"
+            width="100%"
+            height="100%"
+            preserveAspectRatio="none"
+          >
+            <Path
+              d="M0,48 C100,48 150,5 240,20 C300,30 340,40 375,10 L375,48 Z"
+              fill={colors.surface}
+            />
+          </Svg>
+        </View>
+
         <View className="gap-md" style={{ paddingBottom: insets.bottom + 24 }}>
           <PageDots count={onboardingSlides.length} index={index} />
 
@@ -135,10 +161,7 @@ export default function Onboarding() {
             <SlideCopy slide={slide} />
           </View>
 
-          {/* Every slide's copy, laid out off-screen so the visible block above
-              can be pinned to the tallest of them. Absolute so it contributes
-              nothing to the sheet, and transparent so it cannot be seen or
-              touched. */}
+          {/* Off-screen layout measurement for steady height */}
           <View
             style={[StyleSheet.absoluteFill, { opacity: 0 }]}
             pointerEvents="none"
@@ -155,18 +178,24 @@ export default function Onboarding() {
               size="md"
               trailingIcon="arrowRight"
               onPress={() => router.replace("/sign-up")}
+              style={{ backgroundColor: "#FFC629", borderRadius: 999 }}
             />
             <Button
               title="Continue with Google"
               variant="secondary"
               size="md"
-              leading={<GoogleMark />}
+              leading={<GoogleMark size={20} />}
               onPress={() =>
                 Alert.alert(
                   "Not available yet",
                   "Google sign-in is not connected yet. Use email to get started.",
                 )
               }
+              style={{
+                borderRadius: 999,
+                borderColor: "#E5E7EB",
+                borderWidth: 1,
+              }}
             />
           </View>
         </View>

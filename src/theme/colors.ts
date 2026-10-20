@@ -1,4 +1,4 @@
-import { useColorScheme } from "react-native";
+import { useThemeScheme } from "./theme-context";
 
 /**
  * Light-mode brand values.
@@ -115,6 +115,6 @@ export type ColorToken = keyof ThemeColors;
  * `className` path exists for everything else.
  */
 export function useThemeColors(): ThemeColors {
-  const scheme = useColorScheme();
+  const scheme = useThemeScheme();
   return scheme === "dark" ? darkColors : lightColors;
 }

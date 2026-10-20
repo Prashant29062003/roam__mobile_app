@@ -1,9 +1,7 @@
-import { useState } from "react";
-import {
-  TextInput,
-  TextInputKeyPressEvent,
-  View,
-} from "react-native";
+import { useRef, useState } from "react";
+import { Pressable, TextInput, View } from "react-native";
+
+import { ThemedText } from "@/components/ui";
 
 export type CodeInputProps = {
   /** Current code value, capped at 6 digits. */
@@ -30,9 +28,12 @@ export function CodeInput({
   onChange,
   onComplete,
   active = false,
-  size = 44,
+  size = 48,
 }: CodeInputProps) {
-  const boxActive = active || value.length > 0;
+  const inputRef = useRef<TextInput>(null);
+  const [focused, setFocused] = useState(false);
+
+  const isFocusedOrActive = focused || active;
   const currentIndex = Math.min(value.length, 5);
 
   const handleChange = (text: string) => {
@@ -43,30 +44,37 @@ export function CodeInput({
     }
   };
 
-  const handleKeyPress = (event: TextInputKeyPressEvent) => {
-    if (event.nativeEvent.key === "Backspace" && value.length > 0) {
-      onChange(value.slice(0, -1));
-    }
-  };
-
   return (
-    <>
-      <View className="flex-row gap-sm">
+    <Pressable
+      onPress={() => inputRef.current?.focus()}
+      accessibilityRole="button"
+      accessibilityLabel="Verification code input"
+      className="relative"
+    >
+      <View className="flex-row justify-between gap-sm">
         {Array.from({ length: 6 }).map((_, i) => {
           const shown = i < value.length;
-          const lit = i === currentIndex && !shown;
+          const lit = isFocusedOrActive && i === currentIndex && !shown;
+          const isHighlighted = shown || lit || active;
+
           return (
             <View
               key={i}
-              className={`border rounded-control ${boxActive ? "bg-lavender-tint border-lavender" : "bg-background border-border"}`}
+              className={`items-center justify-center border-[1.5px] rounded-control ${
+                isHighlighted
+                  ? "bg-lavender-tint border-lavender"
+                  : "bg-background border-border"
+              }`}
               style={{ width: size, height: size }}
             >
               {shown ? (
-                <TextInput
-                  editable={false}
-                  value={value[i]}
-                  className="text-foreground font-semibold text-center"
-                />
+                <ThemedText
+                  variant="body"
+                  tone="default"
+                  className="font-semibold text-center text-lg"
+                >
+                  {value[i]}
+                </ThemedText>
               ) : null}
             </View>
           );
@@ -74,23 +82,26 @@ export function CodeInput({
       </View>
 
       <TextInput
+        ref={inputRef}
         value={value}
         maxLength={6}
-        keyboardType="numeric"
+        keyboardType="number-pad"
         textContentType="oneTimeCode"
+        autoComplete="one-time-code"
         autoCapitalize="none"
         autoCorrect={false}
         autoFocus
-        editable
+        caretHidden
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
         onChangeText={handleChange}
-        onKeyPress={handleKeyPress}
         style={{
           position: "absolute",
           opacity: 0,
-          width: 0,
-          height: 0,
+          width: 1,
+          height: 1,
         }}
       />
-    </>
+    </Pressable>
   );
 }

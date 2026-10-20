@@ -12,30 +12,34 @@ const GUTTER = 8;
 export type AuthShellProps = {
   title: string;
   subtitle: string;
-  /** The sign-in / sign-up switch that sits below the scroll area. */
+  /** The sign-in / sign-up switch that sits below the form area. */
   footer: ReactNode;
   children: ReactNode;
 };
 
 /**
  * The frame both auth screens share: back button, wordmark, a scrolling body,
- * and a fixed footer.
+ * and a footer.
  *
  * Only the structure lives here. The fields, the CTA, and the copy stay in each
  * screen, because the two differ in more than their wording — sign-up carries a
- * name field and sign-in does not. Two screens is also the point at which a
- * shared view earns a place, so this stops here rather than becoming a
- * configurable form.
+ * name field and sign-in does not.
  */
-export function AuthShell({ title, subtitle, footer, children }: AuthShellProps) {
+export function AuthShell({
+  title,
+  subtitle,
+  footer,
+  children,
+}: AuthShellProps) {
   const insets = useSafeAreaInsets();
 
   return (
     <View className="flex-1 bg-surface">
       <StatusBar style="auto" />
 
+      {/* Top Bar — aligned with px-lg to match the form edges in auth.png */}
       <View
-        className="flex-row items-center justify-between px-md"
+        className="flex-row items-center justify-between px-lg pb-sm"
         style={{ paddingTop: insets.top + GUTTER }}
       >
         <IconButton
@@ -54,8 +58,11 @@ export function AuthShell({ title, subtitle, footer, children }: AuthShellProps)
 
       <ScrollView
         className="flex-1"
-        contentContainerClassName="gap-xl px-lg pt-xl"
-        contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
+        contentContainerClassName="gap-xl px-lg pt-lg"
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingBottom: insets.bottom + 24,
+        }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
@@ -67,14 +74,9 @@ export function AuthShell({ title, subtitle, footer, children }: AuthShellProps)
         </View>
 
         {children}
-      </ScrollView>
 
-      <View
-        className="items-center px-lg pt-md"
-        style={{ paddingBottom: insets.bottom + 24 }}
-      >
-        {footer}
-      </View>
+        <View className="items-center pt-sm">{footer}</View>
+      </ScrollView>
     </View>
   );
 }
@@ -98,7 +100,11 @@ export function AuthSwitch({ prompt, actionLabel, onPress }: AuthSwitchProps) {
         onPress={onPress}
         hitSlop={8}
       >
-        <ThemedText variant="body" tone="default" className="font-medium">
+        <ThemedText
+          variant="body"
+          tone="default"
+          className="font-semibold underline"
+        >
           {actionLabel}
         </ThemedText>
       </Pressable>
