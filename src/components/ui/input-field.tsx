@@ -3,6 +3,7 @@ import {
   Pressable,
   TextInput,
   View,
+  type TextInputInstance,
   type TextInputProps,
 } from "react-native";
 
@@ -68,7 +69,7 @@ export function InputField({
   style,
   ...props
 }: InputFieldProps) {
-  const inputRef = useRef<TextInput>(null);
+  const inputRef = useRef<TextInputInstance>(null);
   const [focused, setFocused] = useState(false);
   const [revealed, setRevealed] = useState(false);
 
@@ -134,8 +135,8 @@ export function InputField({
           {label ? (
             <ThemedText
               variant="caption"
-              tone="foreground"
-              className="font-medium text-[14px] leading-tight mb-0.5"
+              tone="default"
+              className="leading-tight mb-0.5"
             >
               {label}
             </ThemedText>
@@ -143,7 +144,7 @@ export function InputField({
 
           <TextInput
             ref={inputRef}
-            className="text-foreground text-[15px] p-0 m-0 leading-snug"
+            className="font-sans text-foreground text-field p-0 m-0"
             placeholderTextColor="#9CA3AF"
             selectionColor="#C9B4FF"
             cursorColor="#C9B4FF"

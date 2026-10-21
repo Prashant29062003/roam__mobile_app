@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Pressable, TextInput, View } from "react-native";
+import { Pressable, TextInput, type TextInputInstance, View } from "react-native";
 
 import { ThemedText } from "@/components/ui";
 
@@ -30,7 +30,7 @@ export function CodeInput({
   active = false,
   size = 48,
 }: CodeInputProps) {
-  const inputRef = useRef<TextInput>(null);
+  const inputRef = useRef<TextInputInstance>(null);
   const [focused, setFocused] = useState(false);
 
   const isFocusedOrActive = focused || active;
@@ -68,11 +68,7 @@ export function CodeInput({
               style={{ width: size, height: size }}
             >
               {shown ? (
-                <ThemedText
-                  variant="body"
-                  tone="default"
-                  className="font-semibold text-center text-lg"
-                >
+                <ThemedText variant="title" className="text-center">
                   {value[i]}
                 </ThemedText>
               ) : null}
@@ -83,6 +79,7 @@ export function CodeInput({
 
       <TextInput
         ref={inputRef}
+        className="font-sans"
         value={value}
         maxLength={6}
         keyboardType="number-pad"

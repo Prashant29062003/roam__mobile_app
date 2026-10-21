@@ -3,7 +3,6 @@ import {
   Alert,
   FlatList,
   StyleSheet,
-  Text,
   useWindowDimensions,
   View,
   type NativeScrollEvent,
@@ -15,15 +14,14 @@ import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
-import { useThemeColors } from "@/theme";
 
 import { GoogleMark } from "@/components/brand/google-mark";
 import { PageDots } from "@/components/onboarding/page-dots";
 import { SlideCopy } from "@/components/onboarding/slide-copy";
 import { useSteadyHeight } from "@/components/onboarding/use-steady-height";
-import { Button, Icon, Wordmark } from "@/components/ui";
+import { Button, Icon, ThemedText, Wordmark } from "@/components/ui";
 import { onboardingSlides } from "@/data/onboarding-slides";
-import { shadows } from "@/theme";
+import { shadows, useThemeColors } from "@/theme";
 import { useAppTheme } from "@/components/theme-provider";
 
 /** `--spacing-sm`, which cannot ride along in a `className` next to a runtime inset. */
@@ -123,13 +121,10 @@ export default function Onboarding() {
             tint="dark"
             className="flex-row items-center gap-sm self-start rounded-full px-4 py-2 border border-white/20 overflow-hidden"
           >
-            <Icon name="location" size={16} tone="onScrim" color="#FFFFFF" />
-            {/* Using ThemedText inside the glass pill */}
-            <View>
-              <Text className="text-white text-xs font-medium">
-                {slide.location}
-              </Text>
-            </View>
+            <Icon name="location" size={16} tone="onScrim" />
+            <ThemedText variant="caption" tone="onScrim">
+              {slide.location}
+            </ThemedText>
           </BlurView>
         </View>
       </View>

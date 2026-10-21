@@ -1,48 +1,69 @@
+
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/preflight.css" layer(base);
 @import "tailwindcss/utilities.css";
-
 @import "nativewind/theme";
 
 /*
- * Roam design tokens.
+ * Only the app is a source of class names.
  *
- * The palette lives here as CSS variables rather than a TS theme file, because
- * this app styles through NativeWind. Every screen reaches these values as a
- * utility class (`bg-surface`, `p-md`, `rounded-card`, `text-heading`) so no
- * screen ever hardcodes a hex value, size, or spacing step.
+ * Tailwind's automatic content detection scans the whole project, markdown
+ * included, so a class name written in a plan or a comment generated CSS for
+ * a utility nothing renders — and a class that only exists in prose looks
+ * applied when the stylesheet says it is. The docs folders are excluded.
+ */
+@source not "../prompts";
+@source not "../AGENTS.md";
+@source not "../CLAUDE.md";
+@source not "../.opencode";
+@source not "../.agents";
+@source not "../.claude";
+
+/*
+ * The brand typeface.
+ *
+ * design.png §03 calls for "Geometric Sans"; Poppins is the closest match —
+ * single-storey 'a', circular bowls, a straight-tailed 'y', a splayed 'M'. The
+ * five cuts live in `assets/fonts/` and are loaded at runtime by expo-font
+ * (see `src/app/_layout.tsx`).
+ *
+ * This has to be a plain `:root` block, not a `@theme` entry. react-native-css
+ * keeps every `:root` declaration as a runtime variable and resolves the FIRST
+ * entry whose media query matches, so a block placed after the nativewind
+ * import beats nativewind's `System` / `SystemAndroid` values on iOS and
+ * Android. A `@theme` entry would only ever be the fallback for platforms that
+ * match neither `@media ios` nor `@media android`.
+ */
+:root {
+  --font-sans: "Poppins";
+}
+
+/*
+ * Roam design tokens
  *
  * Source of truth: assets/images/prompt-imgs/prompt-imgs/design.png
- *
- * The `@theme` block below only *maps* `--color-*` onto the switchable
- * `--roam-*` values. Light lives in `:root`; dark is supplied at runtime by
- * <ThemeProvider /> (see src/theme/variables.ts), which keeps both halves of
- * the theme reading from one value.
+ * Colors are mapped to runtime-switchable --roam-* variables.
+ * ThemeProvider supplies the active light/dark variables.
  */
 @theme {
-  /* Brand ---------------------------------------------------------------- */
+  /* Brand colors */
   --color-primary: var(--roam-primary);
   --color-star: var(--roam-primary);
   --color-lavender: var(--roam-lavender);
 
-  /* Text/icon colors that sit on a brand fill. `--color-on-primary` is fixed
-   * across both schemes: the yellow fill is light enough in dark mode that its
-   * label stays dark, which is what keeps the primary button legible either
-   * way. `--color-on-lavender` does flip, because lavender lightens in dark.
-   * `--color-on-scrim` is fixed too — a scrim is a dimmed photo, which looks
-   * the same over a light image as over a dark one. */
+  /* Text and icon colors on colored surfaces */
   --color-on-primary: var(--roam-on-primary);
   --color-on-lavender: var(--roam-on-lavender);
   --color-on-scrim: var(--roam-on-scrim);
 
-  /* Surfaces and text --------------------------------------------------- */
+  /* Surfaces and text */
   --color-background: var(--roam-background);
   --color-surface: var(--roam-surface);
   --color-foreground: var(--roam-foreground);
   --color-muted: var(--roam-muted);
   --color-border: var(--roam-border);
 
-  /* Tints, status, and glass --------------------------------------------- */
+  /* Tints, status, and glass */
   --color-lavender-tint: var(--roam-lavender-tint);
   --color-glass: var(--roam-glass);
   --color-scrim: var(--roam-scrim);
@@ -53,7 +74,7 @@
   --color-star-tint: var(--roam-star-tint);
   --color-info-tint: var(--roam-info-tint);
 
-  /* Spacing (4pt grid) --------------------------------------------------- */
+  /* Spacing: 4pt grid */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
@@ -61,59 +82,65 @@
   --spacing-xl: 32px;
   --spacing-xxl: 48px;
 
-  /* Radius --------------------------------------------------------------- */
+  /* Border radius */
   --radius-control: 12px;
   --radius-card: 16px;
-  /* The onboarding bottom sheet. First step above `card` — a sheet is a much
-   * larger surface, so it reads as a different shape, not a bigger card. */
   --radius-sheet: 32px;
   --radius-full: 9999px;
 
-  /* Typography ----------------------------------------------------------- *
-   * The design specifies Geometric Sans. No font files are bundled yet, so
-   * these steps resolve to the platform sans that `nativewind/theme` already
-   * sets (`--font-sans`). Adding Geometric Sans later means loading it with
-   * `expo-font` and setting `fontFamily` here; the ramp itself does not move.
+  /*
+   * Typography
+   *
+   * The ramp follows section 03 of the design reference
+   * (`assets/images/prompt-imgs/prompt-imgs/design.png`): Display, Heading,
+   * Body, Caption and Button, with `hero` and `title` as the app's two extra
+   * steps. Sizes use px to preserve the intended design scale; the family is
+   * `--font-sans` (Poppins), and the weights live in `ThemedText`.
    */
-  --text-display: 56px;
+
+  /* Display — Geometric Sans Bold, 56–64, line height 1.0 */
+  --text-display: 60px;
   --text-display--line-height: 1;
-  /* Screen heroes — the onboarding headline and the auth screen heading. Sits
-   * between `heading` and `display` on purpose: 56 is the wordmark's step, and
-   * reusing it here would make the headline shout over the logotype. Sized off
-   * the onboarding design, measured at roughly 30px against 16px body. */
+
+  /* Hero — the onboarding and auth headline. 32, line height 1.05. */
   --text-hero: 32px;
-  --text-hero--line-height: 1.2;
+  --text-hero--line-height: 1.05;
+
+  /* Heading — Geometric Sans Bold, 28–32, line height 1.2 */
   --text-heading: 28px;
   --text-heading--line-height: 1.2;
-  --text-title: 22px;
+
+  /* Title — card and listing headings. 18, line height 1.2. */
+  --text-title: 18px;
   --text-title--line-height: 1.2;
+
+  /* Body — Geometric Sans Regular, 16, line height 1.5 */
   --text-body: 16px;
-  --text-body--line-height: 1.3;
+  --text-body--line-height: 1.5;
+
+  /* Caption — Geometric Sans Medium, 14 */
   --text-caption: 14px;
-  --text-caption--line-height: 1.5;
+  --text-caption--line-height: 1.4;
+
+  /* Button — Geometric Sans Medium, 17–18 */
   --text-button: 17px;
   --text-button--line-height: 1.2;
 
-  /* Input text. Deliberately has no `--text-field--line-height` companion:
-   * a line-height on a single-line TextInput makes iOS wrap the line and
-   * clips the field, so this step carries a size and nothing else. */
+  /*
+   * TextInput sizing
+   * Keep line-height unset to avoid single-line input clipping.
+   */
   --text-field: 16px;
 
-  /* Motion --------------------------------------------------------------- */
+  /* Motion */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
 }
 
 /*
- * The `:root` block below is the LIGHT scheme, and is only the default for
- * anything rendered before <ThemeProvider /> — web SSR, mostly.
+ * Light theme fallback.
  *
- * Dark mode deliberately does NOT live here as an
- * `@media (prefers-color-scheme: dark)` override. That block compiled and
- * shipped, but never applied to `:root` custom properties on Android: the
- * device reported `dark`, and the page still rendered light. Instead
- * `src/theme/variables.ts` holds both schemes and `ThemeProvider` supplies the
- * right set through react-native-css's `VariableContextProvider`, driven by
- * `useColorScheme()`. Keep this block in step with `colors.ts`.
+ * Keep these values synchronized with lightColors in colors.ts.
+ * Runtime theme changes are provided by ThemeProvider.
  */
 :root {
   --roam-primary: #ffc629;
@@ -131,6 +158,7 @@
   --roam-glass: rgba(255, 255, 255, 0.7);
   --roam-scrim: rgba(11, 11, 26, 0.55);
   --roam-on-scrim: #ffffff;
+
   --roam-success: #0e7a54;
   --roam-success-tint: #e3f5ec;
   --roam-error: #d92d20;

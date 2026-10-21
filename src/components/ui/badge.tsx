@@ -47,7 +47,7 @@ export type BadgeProps = {
  * Small status pill — the tags from the design's tag sheet.
  *
  * `leading-none` on the label for the same reason as `Chip`: the caption ramp's
- * 1.5 ratio leaves the glyphs sitting low in their line box next to the icon.
+ * 1.4 ratio leaves the glyphs sitting low in their line box next to the icon.
  */
 export function Badge({ label, variant = "accent", icon }: BadgeProps) {
   return (

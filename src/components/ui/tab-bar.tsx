@@ -113,7 +113,6 @@ export function TabBar<T extends string>({
             <ThemedText
               variant="caption"
               tone={selected ? "onPrimary" : "default"}
-              className={selected ? undefined : "font-medium"}
             >
               {tab.label}
             </ThemedText>

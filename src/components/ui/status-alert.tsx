@@ -32,7 +32,7 @@ export type StatusAlertProps = {
  * message the moment it appears, instead of leaving it to be discovered.
  *
  * The label keeps a `leading-none` so it centres against the leading glyph
- * rather than drifting down inside its 1.5 line box.
+ * rather than drifting down inside its 1.4 line box.
  */
 export function StatusAlert({
   message,

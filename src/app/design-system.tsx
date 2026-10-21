@@ -139,16 +139,16 @@ export default function DesignSystem() {
 
       <Section
         title="Wordmark"
-        description="Set from the type ramp, not shipped as an image. The design's Geometric Sans is not bundled yet, so this renders in the platform sans."
+        description="Set from the type ramp, not shipped as an image. The design draws the wordmark as a bespoke logotype, so Poppins only gets close."
       >
         <Frame>
-          <Field label="display" hint="56 / extrabold / tightest">
+          <Field label="display" hint="60 / extrabold / tightest">
             <Wordmark />
           </Field>
           <Field label="heading" hint="28 / extrabold / tight">
             <Wordmark size="heading" />
           </Field>
-          <Field label="title" hint="22 / extrabold / tight">
+          <Field label="title" hint="18 / extrabold / tight">
             <Wordmark size="title" />
           </Field>
           <Field label="with tagline" hint="brand lockup, design sheet §01">
@@ -188,15 +188,15 @@ export default function DesignSystem() {
       </Section>
 
       {/* ---------------------------------------------------------------- */}
-      <Section title="Typography" description="Geometric Sans once bundled; platform sans until then.">
+      <Section title="Typography" description="Poppins, the closest match to the design's geometric sans.">
         <Frame>
-          <Field label="display" hint="56 / 1.0 / bold">
+          <Field label="display" hint="60 / 1.0 / bold">
             <ThemedText variant="display">Find your next stay</ThemedText>
           </Field>
           <Field label="heading" hint="28 / 1.2 / bold">
             <ThemedText variant="heading">Modern Cabin</ThemedText>
           </Field>
-          <Field label="title" hint="22 / 1.2 / bold">
+          <Field label="title" hint="18 / 1.2 / bold">
             <ThemedText variant="title">with Hot Tub</ThemedText>
           </Field>
           <Field label="body" hint="16 / 1.5 / regular">
@@ -204,7 +204,7 @@ export default function DesignSystem() {
               From mountain cabins to oceanfront villas.
             </ThemedText>
           </Field>
-          <Field label="caption" hint="14 / 1.5 / medium">
+          <Field label="caption" hint="14 / 1.4 / medium">
             <ThemedText variant="caption">Lake Arrowhead, CA</ThemedText>
           </Field>
           <Field label="button" hint="17 / 1.2 / medium">

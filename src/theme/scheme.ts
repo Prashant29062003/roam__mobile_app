@@ -13,7 +13,7 @@ const appearance =
 /** Exposed so the diagnostics readout can report what the platform supports. */
 export const appearanceInfo = {
   canOverride: typeof appearance.setColorScheme === "function",
-  get: (): ColorSchemeName => {
+  get: (): ColorSchemeName | null => {
     try {
       return appearance.getColorScheme();
     } catch {

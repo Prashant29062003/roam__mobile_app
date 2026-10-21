@@ -42,8 +42,8 @@ export type ChipProps = {
  * search filters and the yellow home categories — pick the variant, not a new
  * component.
  *
- * `leading-none` on the label: the caption ramp carries a 1.5 ratio, so a 14px
- * label sits in a 21px line box and drifts off-centre against a 16px icon.
+ * `leading-none` on the label: the caption ramp carries a 1.4 ratio, so a 14px
+ * label sits in a 19.6px line box and drifts off-centre against a 16px icon.
  * Inside a capsule the line height has to match the glyph.
  */
 export function Chip({

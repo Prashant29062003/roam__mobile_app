@@ -2,6 +2,10 @@
 
 Status: done
 
+> The font and the type ramp were reworked later, in
+> `prompts/09-typography-poppins.md`. The rows and tables below that describe
+> them are marked where they changed.
+
 ## Goal
 
 Every screen draws from one visual source of truth: design tokens derived from
@@ -48,8 +52,8 @@ The dotted edge is the drift risk. There is no build step that keeps
 |---|----------|--------|-----|
 | 1 | Where tokens live | Tailwind v4 `@theme` CSS variables in `src/global.css` | The app styles through NativeWind v5, so the styling library's idioms apply. A TS theme object beside NativeWind would be a second, competing system. |
 | 2 | How dark mode works | `@theme` maps onto switchable `--roam-*` values overridden by `@media (prefers-color-scheme: dark)` | Light and dark stay **one** token set that flips. The alternative, a `dark:` twin, makes every call site responsible for remembering it. |
-| 3 | Font | Platform sans (`nativewind/theme` sets `--font-sans`) | The design specifies Geometric Sans, but no font files are bundled. `--font-sans` is deliberately **not** redefined — doing so breaks Android (`SystemAndroid`). |
-| 4 | Type ramp | Spec's five steps **plus** `title` (22) | The screens show both a page heading (~28) and a card title (~22); the spec's five collapsed them. Confirmed with the user. |
+| 3 | Font | ~~Platform sans (`nativewind/theme` sets `--font-sans`)~~ **Superseded in `09-typography-poppins`**: Poppins, vendored in `assets/fonts/` and loaded at runtime by `expo-font` | The design specifies Geometric Sans. No font files were bundled when this plan was written; the family was chosen and shipped in plan 09. |
+| 4 | Type ramp | Spec's five steps **plus** `title` (18) | The screens show both a page heading (~28) and a card title; the spec's five collapsed them. Confirmed with the user. `title` was 22 here and is 18 since plan 09. |
 | 5 | Colors | The 8 palette entries **plus** role and tint tokens | The design uses yellow as a rating color as well as an action color, lavender as a real interactive fill, and lavender-tinted policy cards. Confirmed with the user, who chose all extras. |
 | 6 | `on-primary` | Fixed `#0B0B1A` in **both** schemes | The yellow fill stays light enough in dark mode that its label must stay dark. `on-lavender` *does* flip, because lavender lightens. |
 | 7 | Shadows | `boxShadow` strings in `src/theme/shadows.ts` | RN 0.76+ prop; the legacy `shadow*`/`elevation` props are never used. Only three levels — the design is mostly flat. |
@@ -101,14 +105,21 @@ The dotted edge is the drift risk. There is no build step that keeps
 
 | Token | Class | Size | Line height | Weight | Used for |
 |-------|-------|------|--------------|--------|----------|
-| `display` | `text-display` | 56 | 1.0 | bold (700) | Non-stack heroes (onboarding) |
+| `display` | `text-display` | 60 | 1.0 | bold (700) | Non-stack heroes (onboarding) |
+| `hero` | `text-hero` | 32 | 1.05 | extrabold (800) | Onboarding and auth headlines (added in `09`) |
 | `heading` | `text-heading` | 28 | 1.2 | bold (700) | Page headings |
-| `title` | `text-title` | 22 | 1.2 | bold (700) | Card titles, prices |
+| `title` | `text-title` | 18 | 1.2 | bold (700) | Card titles, prices |
 | `body` | `text-body` | 16 | 1.5 | regular (400) | Body copy |
-| `caption` | `text-caption` | 14 | 1.5 | medium (500) | Supporting labels, chips |
+| `caption` | `text-caption` | 14 | 1.4 | medium (500) | Supporting labels, chips |
 | `button` | `text-button` | 17 | 1.2 | medium (500) | Button labels |
 | `field` | `text-field` | 16 | **none** | regular (400) | Single-line `TextInput` only |
 
+> The five steps the design sheet names are `display`, `heading`, `body`,
+> `caption` and `button`; `hero` and `title` are the app's two extra steps.
+> Sizes, line heights and weights were reconciled with section 03 of the
+> design in `prompts/09-typography-poppins.md`, which also moved the family to
+> Poppins.
+>
 > Every line height is a **unitless ratio**. `px` values break the layout,
 > because the multiplier is applied against the font size.
 >
@@ -164,7 +175,7 @@ with hairlines and background contrast, not elevation.
 | Item | Belongs to |
 |------|-------------|
 | Screens (`src/app/index.tsx` is a token smoke test) | the first real feature |
-| Font files and `expo-font` loading | after the family is chosen |
+| Font files and `expo-font` loading | ~~after the family is chosen~~ — done in `09-typography-poppins`: Poppins, vendored in `assets/fonts/`, loaded at runtime |
 | Clerk, Sanity, routing, `NativeTabs`, `/design-system` route | `02-system-design` |
 | Motion primitives (`PressableScale`, `expo-haptics`) | later — pressed feedback is an opacity dip |
 
@@ -214,7 +225,8 @@ Added a `## Design system` section recording: tokens live only in
 `src/global.css` `@theme` with dark as `prefers-color-scheme` overrides of the
 same vars; `--text-*--line-height` must be unitless and single-line inputs use
 `--text-field`; the color token list; the type ramp; the platform-sans decision
-and why `--font-sans` must not be redefined; JS-only values in `src/theme/`
+and why `--font-sans` must not be redefined (reversed in `09`, which sets the
+family to Poppins in a `:root` block after the nativewind import); JS-only values in `src/theme/`
 mirroring the CSS literals; the primitive inventory and the two-screens rule;
 `Icon` glyph registration and no emoji; the `styled()` requirement for
 third-party views and the `GlassView` cast; and decorative icons.
