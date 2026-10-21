@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Alert, Keyboard, View } from "react-native";
+import { Keyboard, View } from "react-native";
 import { router } from "expo-router";
 
 import { AuthShell, AuthSwitch } from "@/components/auth/auth-shell";
-import AppleMark from "@/components/brand/apple-mark";
-import { GoogleMark } from "@/components/brand/google-mark";
+import { AppleButton } from "@/components/auth/apple-button";
+import { GoogleButton } from "@/components/auth/google-button";
 import { Button, InputField, ThemedText } from "@/components/ui";
 import { useSession, type AuthError } from "@/auth/session";
 
@@ -50,13 +50,6 @@ export default function SignIn() {
     }
 
     router.replace("/home");
-  };
-
-  const onSocial = () => {
-    Alert.alert(
-      "Not available yet",
-      "This sign-in method isn't connected yet.",
-    );
   };
 
   return (
@@ -130,20 +123,8 @@ export default function SignIn() {
         </View>
 
         <View className="gap-sm">
-          <Button
-            title="Continue with Google"
-            variant="secondary"
-            size="md"
-            leading={<GoogleMark size={20} />}
-            onPress={onSocial}
-          />
-          <Button
-            title="Continue with Apple"
-            variant="secondary"
-            size="md"
-            leading={<AppleMark size={20} />}
-            onPress={onSocial}
-          />
+          <GoogleButton />
+          <AppleButton />
         </View>
       </View>
     </AuthShell>

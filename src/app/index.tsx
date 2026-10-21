@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  Alert,
   FlatList,
   StyleSheet,
   useWindowDimensions,
@@ -15,7 +14,6 @@ import { StatusBar } from "expo-status-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 
-import { GoogleMark } from "@/components/brand/google-mark";
 import { PageDots } from "@/components/onboarding/page-dots";
 import { SlideCopy } from "@/components/onboarding/slide-copy";
 import { useSteadyHeight } from "@/components/onboarding/use-steady-height";
@@ -23,6 +21,7 @@ import { Button, Icon, ThemedText, Wordmark } from "@/components/ui";
 import { onboardingSlides } from "@/data/onboarding-slides";
 import { shadows, useThemeColors } from "@/theme";
 import { useAppTheme } from "@/components/theme-provider";
+import { GoogleButton } from "@/components/auth/google-button";
 
 /** `--spacing-sm`, which cannot ride along in a `className` next to a runtime inset. */
 const GUTTER = 8;
@@ -173,25 +172,8 @@ export default function Onboarding() {
               size="md"
               trailingIcon="arrowRight"
               onPress={() => router.replace("/sign-up")}
-              style={{ backgroundColor: "#FFC629", borderRadius: 999 }}
             />
-            <Button
-              title="Continue with Google"
-              variant="secondary"
-              size="md"
-              leading={<GoogleMark size={20} />}
-              onPress={() =>
-                Alert.alert(
-                  "Not available yet",
-                  "Google sign-in is not connected yet. Use email to get started.",
-                )
-              }
-              style={{
-                borderRadius: 999,
-                borderColor: "#E5E7EB",
-                borderWidth: 1,
-              }}
-            />
+            <GoogleButton />
           </View>
         </View>
       </View>
