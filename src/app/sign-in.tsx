@@ -42,6 +42,13 @@ export default function SignIn() {
       return;
     }
 
+    if (result.needsCode) {
+      // Clerk asked for a second factor — the instance has Device Trust on,
+      // so a password sign-in on a new device gets an email code.
+      router.replace(`/verify-email?email=${encodeURIComponent(email.trim())}`);
+      return;
+    }
+
     router.replace("/home");
   };
 
@@ -93,7 +100,7 @@ export default function SignIn() {
             setPassword(text);
             clearFieldError("password");
           }}
-          placeholder="At least 8 characters"
+          placeholder="At least 15 characters"
           autoCapitalize="none"
           autoComplete="password"
           textContentType="password"

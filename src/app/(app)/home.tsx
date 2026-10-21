@@ -29,10 +29,12 @@ export default function Home() {
         <Button
           title="Sign out"
           variant="secondary"
-          onPress={() => {
-            signOut();
-            // The guard unmounts this route on the next render, but returning
-            // to the anchor explicitly keeps the back stack from replaying it.
+          onPress={async () => {
+            // Clerk tears the session down over the network, so the route
+            // change waits for it. Otherwise the guard and the navigation
+            // race, and the app can land back on a screen that is already
+            // being torn down.
+            await signOut();
             router.replace("/");
           }}
         />

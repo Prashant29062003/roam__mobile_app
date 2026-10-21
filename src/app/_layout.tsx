@@ -12,8 +12,15 @@ import { useThemeColors } from "@/theme";
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY ?? "";
 
-if (!publishableKey) {
-  throw new Error("Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY. Add your key to .env.local.\nRun: 1) clerk auth login  2) clerk link  3) clerk env pull — then restart the dev server.");
+// The publishable key is public — it ships in the bundle. Only a missing one
+// is a problem, and only in development: in a build it is the environment's
+// job to provide it, and Clerk's own error is the honest one to show.
+if (__DEV__ && !publishableKey) {
+  throw new Error(
+    "Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY.\n" +
+      "Run `npx clerk@latest auth login`, then `npx clerk@latest link`, " +
+      "then `npx clerk@latest env pull`, and restart the dev server.",
+  );
 }
 
 SplashScreen.preventAutoHideAsync();
@@ -46,6 +53,9 @@ const POPPINS = [
 /**
  * Holds the splash until the session read settles, so a returning user never
  * sees onboarding flash before the guard moves them to `/home`.
+ *
+ * The session read is a real one now: Clerk restores the session from the
+ * keychain, so this is the wait that keeps a signed-in user out of onboarding.
  *
  * The fonts are part of that wait: rendering before they are ready shows the
  * platform font for a frame, which is the one flash this app cannot have.
@@ -109,6 +119,10 @@ export default function RootLayout() {
   }
 
   return (
+    // `tokenCache` persists the session in the device keychain through
+    // `expo-secure-store`, so a signed-in user stays signed in across a
+    // restart. On web it is undefined and Clerk falls back to its own
+    // storage, so there is no platform branch to write.
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
       <ThemeProvider>
         <SessionProvider>

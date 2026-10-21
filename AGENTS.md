@@ -18,6 +18,15 @@ npx expo install --fix      # fix incompatible package versions
 npx eas-cli@latest <cmd>    # EAS builds, submits, and updates (use instead of bare `eas`)
 ```
 
+## Agents
+
+This project is written to be worked on by any coding agent, and nothing below assumes one.
+
+- **Memory:** `AGENTS.md` is the single source. Every client reads it directly; `CLAUDE.md` is a one-line import for Claude Code.
+- **Skills:** `.agents/skills/` is the shared copy. `npx skills add <source> -a '*' -y` installs a vendor's skills, `npx skills update` refreshes them, and `npx skills experimental_install` restores the exact set pinned in `skills-lock.json` after a fresh clone. The installer junctions them into each client's own directory, so there is one copy and never a drift.
+- **MCP servers:** declared in `.mcp.json` (MCP-standard clients) and `.opencode/opencode.json` (OpenCode). Both are remote HTTP servers with OAuth, so a new client needs the URL and its own sign-in.
+- **Client folders** (`.claude/`, `.opencode/`) are thin shims over the shared files above. Add a client, do not fork the memory.
+
 ## Expo
 
 - Expo ships breaking changes every SDK release, so don't trust memory. Before touching an Expo, EAS, or React Native API, check the `expo` major version in `package.json` and read `https://docs.expo.dev/versions/v<major>.0.0/`. For anything else, start from https://docs.expo.dev/llms.txt and follow its links.
@@ -29,8 +38,9 @@ npx eas-cli@latest <cmd>    # EAS builds, submits, and updates (use instead of b
 
 Each tool has one job. Ask before moving a responsibility to a different tool.
 
-- **Auth:** Clerk is the source of truth. The app keeps its own custom auth screens. Set Clerk up through the Clerk CLI and use the Clerk MCP for current Expo patterns. Clerk is **not installed yet**: `src/auth/session.tsx` is a mock behind a `useSession()` seam, and `Stack.Protected` in `src/app/_layout.tsx` guards on it. Clerk replaces the bodies of `signIn`/`signUp`/`verifyCode` and nothing else — screens, the guard, and the hook signature stay. The mock keeps nothing, so every reload returns to onboarding.
-- **Content:** Sanity (properties, hosts, policies, house rules). Studio is a standalone app in `studio/`. Schema deploys and content changes go through the Sanity MCP, and generated property copy uses Agent Actions.
+- **Auth:** Clerk is the source of truth. The app keeps its own custom auth screens. Clerk is installed: `@clerk/expo` v4 with `expo-secure-store`, mounted in `src/app/_layout.tsx` as `<ClerkProvider publishableKey tokenCache>` — the `tokenCache` keeps the session in the device keychain, so a signed-in user stays signed in across a restart. `src/auth/session.tsx` is the seam: `useSession()` is the only way a screen learns who is signed in, and `signIn`/`signUp`/`verifyCode`/`resendCode`/`signOut` are the only ways a screen acts on it. Clerk fills in the bodies; the screens, the `Stack.Protected` guard, and the hook signature stay. The flow is email + password, with an email code at sign-up, and a second factor when Device Trust asks for one on a new device. The instance's password minimum is 15 characters, and the field copy says so.
+- **Clerk MCP server:** `https://mcp.clerk.com/mcp`, a remote MCP server with OAuth sign-in. It can list and configure applications, manage users, and pull SDK snippets for the Expo integration. It never returns a secret key — keys come from the Dashboard or `clerk env pull`. It is declared in `.mcp.json` (the MCP-standard project config) and in `.opencode/opencode.json` (OpenCode's own schema); a client that reads neither needs the same URL and its own OAuth sign-in, and Clerk's docs list the command per client: https://clerk.com/docs/guides/ai/mcp/clerk-mcp-server
+- **Content:** Sanity (properties, hosts, policies, house rules). Studio is a standalone app in `studio/`. Schema deploys and content changes go through the Sanity MCP once it is configured — it is not wired up yet, and that setup is its own task. Generated property copy uses Agent Actions.
 - **Exact constraints** (price, guests, type, amenities, pets, place): GROQ filters, with values always passed as params.
 - **Soft intent** (quiet, cozy, secluded): Dataset Embeddings via `text::semanticSimilarity()` inside `score()`.
 - **Policy knowledge:** a Sanity Context endpoint in Knowledge Base mode. Context endpoints are created in the Dashboard's Context app and read with an organization token (Context Viewer), per https://www.sanity.io/docs/ai/context-migration-guide. One endpoint serves one mode. The Context skill still describes `sanity.agentContext` Studio documents with a project token; that route is deprecated, so don't use it.
@@ -50,16 +60,16 @@ Each tool has one job. Ask before moving a responsibility to a different tool.
 - PostHog failures never block the app. Never send what guests type, tokens, or personal data in events.
 - Let Sanity generate document IDs. Model relationships as references.
 - Ask before adding a dependency or service, changing the Sanity schema once content exists, or deleting data. Prefer Expo modules over third-party libraries.
-- Whenever you need input from the user, ask through your tool's built-in question panel so they pick from options instead of typing. Give two to four clear options with the recommended one first. Fall back to plain text only if no such panel exists.
+- Whenever you need input from the user, ask through your client's own option picker if it has one, so they pick from options instead of typing. Give two to four clear options with the recommended one first. Fall back to plain text when there is no such panel.
 
 ## How we build features
 
 For a new feature or a change across several files. Small fixes and questions skip this.
 
 1. **Understand.** Read the code involved. Open an earlier plan only if this feature builds directly on it (pick by file name). Read the current docs pages for the APIs you'll use, and load a matching skill if one exists (e.g. the Expo, Clerk, Sanity, Sanity Context, or TypeSafe skills). Don't write version-specific APIs from memory.
-2. **Ask.** If a real decision is unclear (scope, visible behavior, data shape), ask in the question panel, batching questions into one round and following up only if the answers raise new ones. Pick defaults for the rest and list them. If a decision in this file looks wrong, raise it instead of changing it.
+2. **Ask.** If a real decision is unclear (scope, visible behavior, data shape), ask through the client's option picker, batching questions into one round and following up only if the answers raise new ones. Pick defaults for the rest and list them. If a decision in this file looks wrong, raise it instead of changing it.
 3. **Plan.** Copy `prompts/TEMPLATE.md` to `prompts/NN-feature-name.md` (next number) and fill it in. Write decisions as tables, never bullets, and add a Mermaid diagram only where it clarifies a chain or a branch. The plan must be self-contained, so a fresh session can build it from this file plus the plan alone.
-4. **IMPORTANT: stop and wait.** Write no app code until the user approves the plan. Ask for approval in the question panel (approve, or request changes). If they request changes, update the plan and ask again. On approval, set `Status: approved`.
+4. **IMPORTANT: stop and wait.** Write no app code until the user approves the plan. Ask for approval through the client's option picker (approve, or request changes), and in plain text when it has none. If they request changes, update the plan and ask again. On approval, set `Status: approved`.
 5. **Build** step by step, checking each one. If a step turns out wrong, stop and explain instead of redesigning.
 6. **Close out.**
    - Run the plan's Verification and give the report described under Reporting.

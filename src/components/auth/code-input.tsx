@@ -6,7 +6,7 @@ import { ThemedText } from "@/components/ui";
 export type CodeInputProps = {
   /** Current code value, capped at 6 digits. */
   value: string;
-  /** Called whenever the value changes. */
+  /** Called whenever the code changes. */
   onChange: (value: string) => void;
   /** Called once all six digits are filled. */
   onComplete?: (code: string) => void;
@@ -14,6 +14,8 @@ export type CodeInputProps = {
   active?: boolean;
   /** Box size in pixels. */
   size?: number;
+  /** The message to show under the boxes when the code is not accepted. */
+  error?: string;
 };
 
 /**
@@ -29,6 +31,7 @@ export function CodeInput({
   onComplete,
   active = false,
   size = 48,
+  error,
 }: CodeInputProps) {
   const inputRef = useRef<TextInputInstance>(null);
   const [focused, setFocused] = useState(false);
@@ -76,6 +79,12 @@ export function CodeInput({
           );
         })}
       </View>
+
+      {error ? (
+        <ThemedText variant="caption" tone="error" className="mt-xs">
+          {error}
+        </ThemedText>
+      ) : null}
 
       <TextInput
         ref={inputRef}

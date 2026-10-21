@@ -15,27 +15,41 @@ export default function VerifyEmail() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const email = params.email as string | undefined;
-  const { verifyCode } = useSession();
+  const { verifyCode, resendCode } = useSession();
   const insets = useSafeAreaInsets();
 
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [error, setError] = useState<string | undefined>();
 
   const maskedEmail = email
     ? email.replace(/^[^@]+/, () => "•".repeat(email.split("@")[0]!.length))
     : "••••@example.com";
 
   const onSubmit = async () => {
+    if (loading) return;
     setLoading(true);
+    setError(undefined);
     const result = await verifyCode({ email: email ?? "", code });
     setLoading(false);
     if (!result.ok) {
+      setError(result.error.message);
       return;
     }
     router.replace("/home");
   };
 
-  const onResend = () => {
+  const onResend = async () => {
+    if (resending) return;
+    setResending(true);
+    setError(undefined);
+    const result = await resendCode();
+    setResending(false);
+    if (!result.ok) {
+      setError(result.error.message);
+      return;
+    }
     Alert.alert("Code sent", `We've sent a new code to ${maskedEmail}.`);
   };
 
@@ -69,12 +83,22 @@ export default function VerifyEmail() {
           </ThemedText>
 
           <View className="gap-lg">
-            <CodeInput value={code} onChange={setCode} onComplete={onSubmit} />
+            <CodeInput
+              value={code}
+              onChange={setCode}
+              onComplete={onSubmit}
+              error={error}
+            />
 
             <View className="flex-row justify-end">
-              <Pressable accessibilityLabel="Resend code" onPress={onResend}>
+              <Pressable
+                accessibilityLabel="Resend code"
+                accessibilityState={{ disabled: resending }}
+                disabled={resending}
+                onPress={onResend}
+              >
                 <ThemedText variant="caption" tone="lavender">
-                  Resend code
+                  {resending ? "Sending…" : "Resend code"}
                 </ThemedText>
               </Pressable>
             </View>

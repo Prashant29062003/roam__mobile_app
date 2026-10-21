@@ -111,7 +111,7 @@ export default function SignUp() {
             setPassword(text);
             clearFieldError("password");
           }}
-          placeholder="At least 8 characters"
+          placeholder="At least 15 characters"
           autoCapitalize="none"
           autoComplete="password-new"
           textContentType="newPassword"
