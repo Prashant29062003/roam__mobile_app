@@ -1,5 +1,3 @@
-import { useThemeScheme } from "./theme-context";
-
 /**
  * Light-mode brand values.
  *
@@ -13,6 +11,11 @@ import { useThemeScheme } from "./theme-context";
  *
  * The literals below mirror the `:root` block in `src/global.css` exactly.
  * Change both together or they will drift.
+ *
+ * This module holds data and nothing else — no imports. The provider needs
+ * these literals to build the CSS variables, and the hook that reads the
+ * scheme reaches back into the provider, so an import here closed a require
+ * cycle. `useThemeColors` lives in `./use-theme-colors` for that reason.
  */
 export interface ThemeColors {
   /** Brand yellow: primary actions and active states. */
@@ -106,15 +109,3 @@ export const darkColors: ThemeColors = {
 };
 
 export type ColorToken = keyof ThemeColors;
-
-/**
- * Resolves the light or dark half of the palette at render time.
- *
- * This is a hook, so it can only be called inside a component — that is the
- * documented trade-off for brand light/dark pairs, and the reason the
- * `className` path exists for everything else.
- */
-export function useThemeColors(): ThemeColors {
-  const scheme = useThemeScheme();
-  return scheme === "dark" ? darkColors : lightColors;
-}

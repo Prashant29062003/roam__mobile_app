@@ -10,7 +10,18 @@ import {
 import { useColorScheme } from "react-native";
 import { VariableContextProvider } from "nativewind";
 
-import { darkVariables, lightVariables } from "@/theme";
+/**
+ * The variables come from the module, not from the `@/theme` barrel.
+ *
+ * The barrel re-exports `useThemeColors`, which reads the scheme from this
+ * provider, so importing the barrel here closed a require cycle:
+ *
+ *   theme-provider → theme/index → theme/colors → theme/theme-context → theme-provider
+ *
+ * Importing `@/theme/variables` directly keeps the graph acyclic, and the
+ * barrel stays a leaf that only other modules import.
+ */
+import { darkVariables, lightVariables } from "@/theme/variables";
 
 export type ThemeMode = "system" | "light" | "dark";
 export type ColorScheme = "light" | "dark";
